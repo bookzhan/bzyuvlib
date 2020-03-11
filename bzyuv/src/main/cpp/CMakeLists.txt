@@ -49,11 +49,24 @@ add_library(yuv-lib
 set_target_properties(yuv-lib
         PROPERTIES IMPORTED_LOCATION
         ${Project_SOURCE_DIR}/lib/${ANDROID_ABI}/libyuv_static.a)
+
+add_library(tbb-lib
+        STATIC
+        IMPORTED)
+set_target_properties(tbb-lib
+        PROPERTIES IMPORTED_LOCATION
+        ${Project_SOURCE_DIR}/lib/${ANDROID_ABI}/libtbb.a)
+
+
 find_library(jnigraphics-lib jnigraphics)
 
 include_directories(
         ./
-        /libyuv
+        ./include/
+        ./include/libyuv/
+        ./include/serial/
+        ./include/serial/tbb/
+        ./include/tbb/
 )
 # Specifies libraries CMake should link to your target library. You
 # can link multiple libraries, such as libraries you define in this
@@ -64,4 +77,4 @@ target_link_libraries( # Specifies the target library.
 
         # Links the target library to the log library
         # included in the NDK.
-        yuv-lib ${log-lib} ${jnigraphics-lib})
+        tbb-lib yuv-lib ${log-lib} ${jnigraphics-lib})

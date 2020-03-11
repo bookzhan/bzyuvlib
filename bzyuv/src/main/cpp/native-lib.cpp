@@ -1,7 +1,7 @@
 #include <jni.h>
 #include <string>
 #include "BZLogUtil.h"
-#include "libyuv.h"
+#include "include/libyuv.h"
 #include "bz_time.h"
 
 enum Pix_Format {
