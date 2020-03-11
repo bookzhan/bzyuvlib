@@ -63,8 +63,10 @@ public class BZCamera2View extends TextureView implements TextureView.SurfaceTex
     private Handler mYUVHandler = null;
     private Range<Integer>[] fpsRanges;
     private OnPreviewBitmapListener onPreviewBitmapListener;
-    private ByteBuffer argbByteBuffer = null;
     private Bitmap bitmap = null;
+    private long index = 0;
+    private long spaceTime = 0;
+    private BZYUVUtil bzyuvUtil;
 
     public BZCamera2View(Context context) {
         this(context, null);
@@ -78,6 +80,7 @@ public class BZCamera2View extends TextureView implements TextureView.SurfaceTex
         super(context, attrs, defStyleAttr);
         setSurfaceTextureListener(this);
         dp_1 = getResources().getDisplayMetrics().density;
+        bzyuvUtil = new BZYUVUtil();
     }
 
     public void onResume() {
@@ -492,18 +495,12 @@ public class BZCamera2View extends TextureView implements TextureView.SurfaceTex
     @Override
     public void onImageAvailable(ImageReader reader) {
         Image image = reader.acquireLatestImage();
-
         if (image == null) {
             return;
         }
-        image.getPlanes()[2].getPixelStride();
         int width = image.getWidth();
         int height = image.getHeight();
-        if (null == argbByteBuffer) {
-            argbByteBuffer = ByteBuffer.allocateDirect(width * height * 4);
-            argbByteBuffer.order(ByteOrder.nativeOrder());
-            argbByteBuffer.position(0);
-        }
+
         if (null == bitmap) {
 //            bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
             bitmap = Bitmap.createBitmap(height, width, Bitmap.Config.ARGB_8888);
@@ -511,11 +508,11 @@ public class BZCamera2View extends TextureView implements TextureView.SurfaceTex
 
         if (null != onPreviewBitmapListener) {
             long startTime = System.currentTimeMillis();
-            Image.Plane[] planes = image.getPlanes();
-            BZYUVUtil.yuv420pToRGBA(planes[0].getBuffer(), planes[1].getBuffer(), planes[1].getPixelStride(), planes[2].getBuffer(), planes[2].getPixelStride(), argbByteBuffer, width, height, false, 90);
-            bitmap.copyPixelsFromBuffer(ByteBuffer.wrap(argbByteBuffer.array()));
-
-            Log.d(TAG, "yuv转换 耗时=" + (System.currentTimeMillis() - startTime) + " bitmap.width=" + width + " height=" + height);
+            byte[] bytes = bzyuvUtil.yuv420pToBGRA(image, true, 90);
+            bitmap.copyPixelsFromBuffer(ByteBuffer.wrap(bytes));
+            spaceTime += (System.currentTimeMillis() - startTime);
+            index++;
+            Log.d(TAG, "平均 yuv转换 耗时=" + (spaceTime / index) + " bitmap.width=" + width + " height=" + height);
             onPreviewBitmapListener.onPreviewBitmapListener(bitmap);
         }
         image.close();

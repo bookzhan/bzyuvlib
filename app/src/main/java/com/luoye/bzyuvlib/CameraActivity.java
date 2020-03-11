@@ -19,7 +19,7 @@ public class CameraActivity extends AppCompatActivity {
 
     private BZCameraView bz_camera_view;
     private ImageView bz_image_view;
-    private ByteBuffer argbByteBuffer = null;
+    private byte[] argbByteBuffer = null;
     private int index = 0;
     private Bitmap bitmap = null;
     private long totalTime = 0;
@@ -51,13 +51,11 @@ public class CameraActivity extends AppCompatActivity {
             @Override
             public void onPreviewDataUpdate(byte[] data, int width, int height, int displayOrientation, int cameraId) {
                 if (null == argbByteBuffer) {
-                    argbByteBuffer = ByteBuffer.allocateDirect(width * height * 4);
-                    argbByteBuffer.order(ByteOrder.nativeOrder());
-                    argbByteBuffer.position(0);
+                    argbByteBuffer = new byte[width * height * 4];
                 }
                 index++;
                 long startTime = System.currentTimeMillis();
-                BZYUVUtil.yv12ToARGB(data, argbByteBuffer, width, height, cameraId == Camera.CameraInfo.CAMERA_FACING_FRONT, displayOrientation);
+                BZYUVUtil.yv12ToBGRA(data, argbByteBuffer, width, height, cameraId == Camera.CameraInfo.CAMERA_FACING_FRONT, displayOrientation);
                 totalTime += (System.currentTimeMillis() - startTime);
                 Log.d("onPreviewDataUpdate", "耗时=" + (totalTime / index));
 
@@ -68,7 +66,7 @@ public class CameraActivity extends AppCompatActivity {
                         bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
                     }
                 }
-                bitmap.copyPixelsFromBuffer(ByteBuffer.wrap(argbByteBuffer.array()));
+                bitmap.copyPixelsFromBuffer(ByteBuffer.wrap(argbByteBuffer));
                 bz_image_view.post(new Runnable() {
                     @Override
                     public void run() {
