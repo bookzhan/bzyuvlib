@@ -13,6 +13,7 @@ import java.nio.ByteBuffer;
  */
 public class BZYUVUtil {
     static {
+        System.loadLibrary("tbb");
         System.loadLibrary("bzyuvlib");
     }
 
@@ -44,6 +45,8 @@ public class BZYUVUtil {
         BZYUVUtil.yuv420pToBGRA(planes[0].getBuffer(), planes[1].getBuffer(), planes[1].getPixelStride(), planes[2].getBuffer(), planes[2].getPixelStride(), outDataBGRA, image.getWidth(), image.getHeight(), flipHorizontal, rotate);
         return outDataBGRA;
     }
+
+    public static native int test();
 
     public static native int yuv420pToRGBA(ByteBuffer byteBufferY, ByteBuffer byteBufferU, int uPixelStride, ByteBuffer byteBufferV, int vPixelStride, byte[] outDate, int width, int height, boolean flipHorizontal, int rotate);
 

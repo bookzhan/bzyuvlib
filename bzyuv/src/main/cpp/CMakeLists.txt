@@ -51,11 +51,11 @@ set_target_properties(yuv-lib
         ${Project_SOURCE_DIR}/lib/${ANDROID_ABI}/libyuv_static.a)
 
 add_library(tbb-lib
-        STATIC
+        SHARED
         IMPORTED)
 set_target_properties(tbb-lib
         PROPERTIES IMPORTED_LOCATION
-        ${Project_SOURCE_DIR}/lib/${ANDROID_ABI}/libtbb.a)
+        ${Project_SOURCE_DIR}/lib/${ANDROID_ABI}/libtbb.so)
 
 
 find_library(jnigraphics-lib jnigraphics)

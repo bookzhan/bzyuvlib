@@ -3,6 +3,7 @@
 #include "BZLogUtil.h"
 #include "include/libyuv.h"
 #include "bz_time.h"
+#include "tbb/parallel_for.h"
 
 enum Pix_Format {
     RGBA, BGRA
@@ -267,4 +268,16 @@ Java_com_luoye_bzyuvlib_BZYUVUtil_yv12ToBGRA(JNIEnv *env, jclass clazz, jbyteArr
     env->ReleaseByteArrayElements(yv12_, data_yv12, 0);
     env->ReleaseByteArrayElements(out_date, p_argb_byte_buffer, 0);
     return ret;
+}extern "C"
+JNIEXPORT jint JNICALL
+Java_com_luoye_bzyuvlib_BZYUVUtil_test(JNIEnv *env, jclass clazz) {
+    int64_t startTime = getCurrentTime();
+    tbb::parallel_for(tbb::blocked_range<size_t>(0, 10000),
+                      [=](const tbb::blocked_range<size_t> &r) {
+                          for (size_t i = r.begin(); i != r.end(); ++i) {
+                              BZLogUtil::logV("test index=%d", i);
+                          }
+                      });
+    BZLogUtil::logE("test 耗时=%lld", getCurrentTime() - startTime);
+    return 0;
 }
