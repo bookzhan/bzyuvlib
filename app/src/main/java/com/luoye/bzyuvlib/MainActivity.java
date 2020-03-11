@@ -59,8 +59,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void Camera2Activity(View view) {
-//        startActivity(new Intent(this, Camera2Activity.class));
-        BZYUVUtil.test();
+        startActivity(new Intent(this, Camera2Activity.class));
+//        BZYUVUtil.test();
     }
 
     public void CameraActivity(View view) {

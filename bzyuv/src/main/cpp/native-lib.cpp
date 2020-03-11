@@ -179,6 +179,13 @@ int pretreatmentYuv420pData(JNIEnv *env, jclass clazz, jobject byte_buffer_y,
         unsigned char *tempUP = srcData + ySize;
         unsigned char *tempVP = srcData + ySize + ySize / 4;
         if (uBufferCapacity == vBufferCapacity && u_pixel_stride == v_pixel_stride) {
+//            tbb::parallel_for(tbb::blocked_range<size_t>(0, uBufferCapacity),
+//                              [=](const tbb::blocked_range<size_t> &r) {
+//                                  for (size_t i = r.begin(); i <= r.end(); i += u_pixel_stride) {
+//                                      *(tempUP + i / 2) = *(pUData + i);
+//                                      *(tempVP + i / 2) = *(pVData + i);
+//                                  }
+//                              });
             for (int i = 0; i < uBufferCapacity; i += u_pixel_stride) {
                 *tempUP = *(pUData + i);
                 *tempVP = *(pVData + i);

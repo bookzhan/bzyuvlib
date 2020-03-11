@@ -509,8 +509,8 @@ public class BZCamera2View extends TextureView implements TextureView.SurfaceTex
         if (null != onPreviewBitmapListener) {
             long startTime = System.currentTimeMillis();
             byte[] bytes = bzyuvUtil.yuv420pToBGRA(image, true, 90);
-            bitmap.copyPixelsFromBuffer(ByteBuffer.wrap(bytes));
             spaceTime += (System.currentTimeMillis() - startTime);
+            bitmap.copyPixelsFromBuffer(ByteBuffer.wrap(bytes));
             index++;
             Log.d(TAG, "平均 yuv转换 耗时=" + (spaceTime / index) + " bitmap.width=" + width + " height=" + height);
             onPreviewBitmapListener.onPreviewBitmapListener(bitmap);
