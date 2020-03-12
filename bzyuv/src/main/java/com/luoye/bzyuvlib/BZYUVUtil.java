@@ -13,7 +13,6 @@ import java.nio.ByteBuffer;
  */
 public class BZYUVUtil {
     static {
-        System.loadLibrary("tbb");
         System.loadLibrary("bzyuvlib");
     }
 
