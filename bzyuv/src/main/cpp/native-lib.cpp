@@ -3,7 +3,6 @@
 #include "BZLogUtil.h"
 #include "include/libyuv.h"
 #include "bz_time.h"
-#include "tbb/parallel_for.h"
 
 enum Pix_Format {
     RGBA, BGRA

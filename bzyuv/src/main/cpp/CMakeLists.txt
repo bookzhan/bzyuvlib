@@ -37,12 +37,6 @@ find_library( # Sets the name of the path variable.
         # you want CMake to locate.
         log)
 
-#add_library(libopencv_java-lib
-#        SHARED
-#        IMPORTED)
-#set_target_properties(libopencv_java-lib
-#        PROPERTIES IMPORTED_LOCATION
-#        libopencv_java3.so)
 add_library(yuv-lib
         STATIC
         IMPORTED)
@@ -50,23 +44,10 @@ set_target_properties(yuv-lib
         PROPERTIES IMPORTED_LOCATION
         ${Project_SOURCE_DIR}/lib/${ANDROID_ABI}/libyuv_static.a)
 
-add_library(tbb-lib
-        SHARED
-        IMPORTED)
-set_target_properties(tbb-lib
-        PROPERTIES IMPORTED_LOCATION
-        ${Project_SOURCE_DIR}/lib/${ANDROID_ABI}/libtbb.so)
-
-
-find_library(jnigraphics-lib jnigraphics)
-
 include_directories(
         ./
         ./include/
         ./include/libyuv/
-        ./include/serial/
-        ./include/serial/tbb/
-        ./include/tbb/
 )
 # Specifies libraries CMake should link to your target library. You
 # can link multiple libraries, such as libraries you define in this
@@ -77,4 +58,4 @@ target_link_libraries( # Specifies the target library.
 
         # Links the target library to the log library
         # included in the NDK.
-        tbb-lib yuv-lib ${log-lib} ${jnigraphics-lib})
+        yuv-lib ${log-lib})
