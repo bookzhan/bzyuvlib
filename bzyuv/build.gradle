@@ -5,7 +5,7 @@ publish {
     userOrg = 'bookzhan' //bintray账户下某个组织id
     groupId = 'com.luoye.bzlib' //maven仓库下库的包名，一般为模块包名
     artifactId = 'bzyuv' //项目名称
-    publishVersion = '1.1.3' //版本号
+    publishVersion = '1.1.4' //版本号
     uploadName = 'bzyuv'
     repoName = 'bzlib'
     desc = 'bzyuv util' //项目介绍，可以不写
@@ -54,9 +54,4 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-
-    implementation 'androidx.appcompat:appcompat:1.1.0'
-    testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 }

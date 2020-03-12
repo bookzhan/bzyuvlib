@@ -3,7 +3,6 @@ package com.luoye.bzyuvlib;
 import android.media.Image;
 import android.os.Build;
 
-import androidx.annotation.RequiresApi;
 
 import java.nio.ByteBuffer;
 
@@ -19,9 +18,8 @@ public class BZYUVUtil {
     private byte[] outDataRGBA = null;
     private byte[] outDataBGRA = null;
 
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public byte[] yuv420pToRGBA(Image image, boolean flipHorizontal, int rotate) {
-        if (null == image) {
+        if (null == image || Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
             return null;
         }
         if (null == outDataRGBA) {
@@ -32,9 +30,8 @@ public class BZYUVUtil {
         return outDataRGBA;
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public byte[] yuv420pToBGRA(Image image, boolean flipHorizontal, int rotate) {
-        if (null == image) {
+        if (null == image || Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
             return null;
         }
         if (null == outDataBGRA) {
