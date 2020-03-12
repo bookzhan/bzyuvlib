@@ -46,13 +46,16 @@ public class BZYUVUtil {
         return outDataBGRA;
     }
 
-    public static native int test();
-
     public static native int yuv420pToRGBA(ByteBuffer byteBufferY, ByteBuffer byteBufferU, int uPixelStride, ByteBuffer byteBufferV, int vPixelStride, byte[] outDate, int width, int height, boolean flipHorizontal, int rotate);
 
     public static native int yuv420pToBGRA(ByteBuffer byteBufferY, ByteBuffer byteBufferU, int uPixelStride, ByteBuffer byteBufferV, int vPixelStride, byte[] outDate, int width, int height, boolean flipHorizontal, int rotate);
 
-    public static native int yv12ToARGB(byte[] yv12, byte[] outDate, int width, int height, boolean flipHorizontal, int rotate);
+    public static native int yv12ToRGBA(byte[] yv12, byte[] outDate, int width, int height, boolean flipHorizontal, int rotate);
 
     public static native int yv12ToBGRA(byte[] yv12, byte[] outDate, int width, int height, boolean flipHorizontal, int rotate);
+
+    public static native int nv21ToRGBA(byte[] nv21, byte[] outDate, int width, int height, boolean flipHorizontal, int rotate);
+
+    public static native int nv21ToBGRA(byte[] nv21, byte[] outDate, int width, int height, boolean flipHorizontal, int rotate);
+
 }

@@ -13,7 +13,6 @@ import com.luoye.bzcamera.BZCameraView;
 import com.luoye.bzcamera.listener.CameraStateListener;
 
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 
 public class CameraActivity extends AppCompatActivity {
 
@@ -35,7 +34,7 @@ public class CameraActivity extends AppCompatActivity {
 
 //        bz_image_view.setScaleX(-1);
 //        bz_image_view.setScaleY(-1);
-        bz_camera_view.setPreviewFormat(ImageFormat.YV12);
+        bz_camera_view.setPreviewFormat(ImageFormat.NV21);
         bz_camera_view.setNeedCallBackData(true);
         bz_camera_view.setCameraStateListener(new CameraStateListener() {
             @Override
@@ -55,9 +54,9 @@ public class CameraActivity extends AppCompatActivity {
                 }
                 index++;
                 long startTime = System.currentTimeMillis();
-                BZYUVUtil.yv12ToBGRA(data, argbByteBuffer, width, height, cameraId == Camera.CameraInfo.CAMERA_FACING_FRONT, displayOrientation);
+                BZYUVUtil.nv21ToRGBA(data, argbByteBuffer, width, height, cameraId == Camera.CameraInfo.CAMERA_FACING_FRONT, displayOrientation);
                 totalTime += (System.currentTimeMillis() - startTime);
-                Log.d("onPreviewDataUpdate", "耗时=" + (totalTime / index));
+                Log.d("bz_yuv转换", "耗时=" + (totalTime / index));
 
                 if (null == bitmap) {
                     if (displayOrientation == 270 || displayOrientation == 90) {

@@ -90,43 +90,6 @@ handle_conversion(unsigned char *yData, unsigned char *uData, unsigned char *vDa
     return 0;
 }
 
-extern "C"
-JNIEXPORT jint JNICALL
-Java_com_luoye_bzyuvlib_BZYUVUtil_yv12ToARGB(JNIEnv *env, jclass clazz, jbyteArray yv12_,
-                                             jbyteArray out_date, jint width, jint height,
-                                             jboolean flip_horizontal, jint rotate) {
-    if (nullptr == yv12_ || nullptr == out_date) {
-        BZLogUtil::logE("nullptr == nv21_ || nullptr == byte_buffer_");
-        return -1;
-    }
-    if (rotate != 0 && rotate != 90 && rotate != 180 && rotate != 270) {
-        BZLogUtil::logE("rotate != 9 && rotate != 90 && rotate != 180 && rotate != 270");
-        return -1;
-    }
-    jbyte *data_yv12 = env->GetByteArrayElements(yv12_, JNI_FALSE);
-    if (nullptr == data_yv12) {
-        BZLogUtil::logE("nullptr == data_nv21");
-        return -1;
-    }
-    auto *p_argb_byte_buffer = env->GetByteArrayElements(out_date, JNI_FALSE);
-    if (nullptr == p_argb_byte_buffer) {
-        BZLogUtil::logE("Get p_byte_buffer return null");
-        return -1;
-    }
-    int ySize = width * height;
-    int ret = handle_conversion(reinterpret_cast<unsigned char *>(data_yv12),
-                                reinterpret_cast<unsigned char *>(data_yv12 + ySize),
-                                reinterpret_cast<unsigned char *>(data_yv12 + ySize + ySize / 4),
-                                reinterpret_cast<unsigned char *>(p_argb_byte_buffer), width,
-                                height, flip_horizontal, rotate);
-    if (ret < 0) {
-        BZLogUtil::logE("handle_conversion fail");
-    }
-    env->ReleaseByteArrayElements(yv12_, data_yv12, JNI_FALSE);
-    env->ReleaseByteArrayElements(out_date, p_argb_byte_buffer, JNI_FALSE);
-    return ret;
-}
-
 int pretreatmentYuv420pData(JNIEnv *env, jclass clazz, jobject byte_buffer_y,
                             jobject byte_buffer_u, jint u_pixel_stride,
                             jobject byte_buffer_v, jint v_pixel_stride,
@@ -161,57 +124,64 @@ int pretreatmentYuv420pData(JNIEnv *env, jclass clazz, jobject byte_buffer_y,
 
     int ySize = width * height;
     int yuvSize = ySize * 3 / 2;
-
-
     jlong uBufferCapacity = env->GetDirectBufferCapacity(byte_buffer_u);
     jlong vBufferCapacity = env->GetDirectBufferCapacity(byte_buffer_v);
+
+
     int ret = 0;
-    if (u_pixel_stride == v_pixel_stride && u_pixel_stride == 1) {
+    if (u_pixel_stride == v_pixel_stride && u_pixel_stride == 1) {//YV12
         ret = handle_conversion(reinterpret_cast<unsigned char *>(pYData),
                                 reinterpret_cast<unsigned char *>(pVData),
                                 reinterpret_cast<unsigned char *>(pUData),
                                 reinterpret_cast<unsigned char *>(p_argb_Data), width,
                                 height, flip_horizontal, rotate, pixFormat);
-    } else {
-        unsigned char *srcData = static_cast<unsigned char *>(malloc(yuvSize));
-        memset(srcData, 0, yuvSize);
-        memcpy(srcData, pYData, ySize);
-        unsigned char *tempUP = srcData + ySize;
-        unsigned char *tempVP = srcData + ySize + ySize / 4;
-        if (uBufferCapacity == vBufferCapacity && u_pixel_stride == v_pixel_stride) {
-//            tbb::parallel_for(tbb::blocked_range<size_t>(0, uBufferCapacity),
-//                              [=](const tbb::blocked_range<size_t> &r) {
-//                                  for (size_t i = r.begin(); i <= r.end(); i += u_pixel_stride) {
-//                                      *(tempUP + i / 2) = *(pUData + i);
-//                                      *(tempVP + i / 2) = *(pVData + i);
-//                                  }
-//                              });
-            for (int i = 0; i < uBufferCapacity; i += u_pixel_stride) {
-                *tempUP = *(pUData + i);
-                *tempVP = *(pVData + i);
-                tempUP++;
-                tempVP++;
-            }
+    } else {//NV21
+        int temp = pUData - pVData;
+        unsigned char *buffer = static_cast<unsigned char *>(malloc(yuvSize));
+        //Continuous memory storage
+        if (temp == 1) {
+            ret = libyuv::NV21ToI420(reinterpret_cast<const uint8 *>(pYData), width,
+                                     reinterpret_cast<const uint8 *>(pVData), width,
+                                     buffer, width,
+                                     buffer + ySize, width / 2,
+                                     buffer + ySize + ySize / 4,
+                                     width / 2, width,
+                                     height);
+        } else if (temp == -1) {
+            ret = libyuv::NV21ToI420(reinterpret_cast<const uint8 *>(pYData), width,
+                                     reinterpret_cast<const uint8 *>(pUData), width,
+                                     buffer, width,
+                                     buffer + ySize, width / 2,
+                                     buffer + ySize + ySize / 4, width / 2, width,
+                                     height);
         } else {
-            for (int i = 0; i < uBufferCapacity; i += u_pixel_stride) {
-                *tempUP = *(pUData + i);
-                tempUP++;
-            }
-            for (int i = 0; i < vBufferCapacity; i += v_pixel_stride) {
-                *tempVP = *(pVData + i);
-                tempVP++;
+            unsigned char *tempUP = buffer + ySize;
+            unsigned char *tempVP = buffer + ySize + ySize / 4;
+            if (uBufferCapacity == vBufferCapacity && u_pixel_stride == v_pixel_stride) {
+                for (int i = 0; i < uBufferCapacity; i += u_pixel_stride) {
+                    *tempUP = *(pUData + i);
+                    *tempVP = *(pVData + i);
+                    tempUP++;
+                    tempVP++;
+                }
+            } else {
+                for (int i = 0; i < uBufferCapacity; i += u_pixel_stride) {
+                    *tempUP = *(pUData + i);
+                    tempUP++;
+                }
+                for (int i = 0; i < vBufferCapacity; i += v_pixel_stride) {
+                    *tempVP = *(pVData + i);
+                    tempVP++;
+                }
             }
         }
-        int ret = handle_conversion(srcData, srcData + ySize + ySize / 4, srcData + ySize,
+        int ret = handle_conversion(buffer, buffer + ySize + ySize / 4, buffer + ySize,
                                     reinterpret_cast<unsigned char *>(p_argb_Data), width,
                                     height, flip_horizontal, rotate, pixFormat);
-        free(srcData);
-    }
-    if (ret < 0) {
-        BZLogUtil::logE("handle_conversion fail");
+        free(buffer);
     }
     env->ReleaseByteArrayElements(out_date, p_argb_Data, JNI_FALSE);
-    return ret;
+    return 0;
 }
 
 extern "C"
@@ -240,11 +210,10 @@ Java_com_luoye_bzyuvlib_BZYUVUtil_yuv420pToBGRA(JNIEnv *env, jclass clazz, jobje
                                    byte_buffer_v, v_pixel_stride, out_date, width, height,
                                    flip_horizontal, rotate, Pix_Format::BGRA);
 }
-extern "C"
-JNIEXPORT jint JNICALL
-Java_com_luoye_bzyuvlib_BZYUVUtil_yv12ToBGRA(JNIEnv *env, jclass clazz, jbyteArray yv12_,
-                                             jbyteArray out_date, jint width, jint height,
-                                             jboolean flip_horizontal, jint rotate) {
+
+int pretreatmentYU12Data(JNIEnv *env, jclass clazz, jbyteArray yv12_,
+                         jbyteArray out_date, jint width, jint height,
+                         jboolean flip_horizontal, jint rotate, Pix_Format pixFormat) {
     if (nullptr == yv12_ || nullptr == out_date) {
         BZLogUtil::logE("nullptr == nv21_ || nullptr == byte_buffer_");
         return -1;
@@ -268,23 +237,97 @@ Java_com_luoye_bzyuvlib_BZYUVUtil_yv12ToBGRA(JNIEnv *env, jclass clazz, jbyteArr
                                 reinterpret_cast<unsigned char *>(data_yv12 + ySize),
                                 reinterpret_cast<unsigned char *>(data_yv12 + ySize + ySize / 4),
                                 reinterpret_cast<unsigned char *>(p_argb_byte_buffer), width,
-                                height, flip_horizontal, rotate, BGRA);
+                                height, flip_horizontal, rotate, pixFormat);
     if (ret < 0) {
         BZLogUtil::logE("handle_conversion fail");
     }
     env->ReleaseByteArrayElements(yv12_, data_yv12, 0);
     env->ReleaseByteArrayElements(out_date, p_argb_byte_buffer, 0);
     return ret;
-}extern "C"
+}
+
+
+extern "C"
 JNIEXPORT jint JNICALL
-Java_com_luoye_bzyuvlib_BZYUVUtil_test(JNIEnv *env, jclass clazz) {
-    int64_t startTime = getCurrentTime();
-    tbb::parallel_for(tbb::blocked_range<size_t>(0, 10000),
-                      [=](const tbb::blocked_range<size_t> &r) {
-                          for (size_t i = r.begin(); i != r.end(); ++i) {
-                              BZLogUtil::logV("test index=%d", i);
-                          }
-                      });
-    BZLogUtil::logE("test 耗时=%lld", getCurrentTime() - startTime);
-    return 0;
+Java_com_luoye_bzyuvlib_BZYUVUtil_yv12ToRGBA(JNIEnv *env, jclass clazz, jbyteArray yv12_,
+                                             jbyteArray out_date, jint width, jint height,
+                                             jboolean flip_horizontal, jint rotate) {
+    return pretreatmentYU12Data(env, clazz, yv12_, out_date, width, height, flip_horizontal, rotate,
+                                RGBA);
+}
+
+extern "C"
+JNIEXPORT jint JNICALL
+Java_com_luoye_bzyuvlib_BZYUVUtil_yv12ToBGRA(JNIEnv *env, jclass clazz, jbyteArray yv12_,
+                                             jbyteArray out_date, jint width, jint height,
+                                             jboolean flip_horizontal, jint rotate) {
+
+    return pretreatmentYU12Data(env, clazz, yv12_, out_date, width, height, flip_horizontal, rotate,
+                                BGRA);
+}
+
+int pretreatmentNV21Data(JNIEnv *env, jclass clazz, jbyteArray nv21_,
+                         jbyteArray out_date, jint width, jint height,
+                         jboolean flip_horizontal, jint rotate, Pix_Format pixFormat) {
+    if (nullptr == nv21_ || nullptr == out_date) {
+        BZLogUtil::logE("nullptr == nv21_ || nullptr == byte_buffer_");
+        return -1;
+    }
+    if (rotate != 0 && rotate != 90 && rotate != 180 && rotate != 270) {
+        BZLogUtil::logE("rotate != 9 && rotate != 90 && rotate != 180 && rotate != 270");
+        return -1;
+    }
+    jbyte *data_nv21 = env->GetByteArrayElements(nv21_, nullptr);
+    if (nullptr == data_nv21) {
+        BZLogUtil::logE("nullptr == data_nv21");
+        return -1;
+    }
+    auto *p_argb_byte_buffer = env->GetByteArrayElements(out_date, JNI_FALSE);
+    if (nullptr == p_argb_byte_buffer) {
+        BZLogUtil::logE("Get p_byte_buffer return null");
+        return -1;
+    }
+    int ySize = width * height;
+    int yuvSize = ySize * 3 / 2;
+    unsigned char *buffer = static_cast<unsigned char *>(malloc(yuvSize));
+
+    int ret = libyuv::NV21ToI420(reinterpret_cast<const uint8 *>(data_nv21), width,
+                                 reinterpret_cast<const uint8 *>(data_nv21 + ySize), width,
+                                 buffer, width,
+                                 buffer + ySize, width / 2,
+                                 buffer + ySize + ySize / 4,
+                                 width / 2, width,
+                                 height);
+    if (ret < 0) {
+        BZLogUtil::logE("NV21ToI420 fail");
+    }
+    ret = handle_conversion(buffer,
+                            buffer + ySize + ySize / 4,
+                            buffer + ySize,
+                            reinterpret_cast<unsigned char *>(p_argb_byte_buffer), width,
+                            height, flip_horizontal, rotate, pixFormat);
+    if (ret < 0) {
+        BZLogUtil::logE("handle_conversion fail");
+    }
+    free(buffer);
+    env->ReleaseByteArrayElements(nv21_, data_nv21, 0);
+    env->ReleaseByteArrayElements(out_date, p_argb_byte_buffer, 0);
+    return ret;
+}
+
+extern "C"
+JNIEXPORT jint JNICALL
+Java_com_luoye_bzyuvlib_BZYUVUtil_nv21ToRGBA(JNIEnv *env, jclass clazz, jbyteArray nv21,
+                                             jbyteArray out_date, jint width, jint height,
+                                             jboolean flip_horizontal, jint rotate) {
+    return pretreatmentNV21Data(env, clazz, nv21, out_date, width, height, flip_horizontal, rotate,
+                                RGBA);
+}
+extern "C"
+JNIEXPORT jint JNICALL
+Java_com_luoye_bzyuvlib_BZYUVUtil_nv21ToBGRA(JNIEnv *env, jclass clazz, jbyteArray nv21,
+                                             jbyteArray out_date, jint width, jint height,
+                                             jboolean flip_horizontal, jint rotate) {
+    return pretreatmentNV21Data(env, clazz, nv21, out_date, width, height, flip_horizontal, rotate,
+                                BGRA);
 }

@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.luoye.bzyuvlib.BZCamera2View
+    <com.luoye.bzcamera.BZCamera2View
         android:id="@+id/bz_camera2_view"
         android:layout_width="480px"
         android:layout_height="640px" />
