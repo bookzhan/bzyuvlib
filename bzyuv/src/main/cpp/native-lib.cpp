@@ -135,7 +135,7 @@ int pretreatmentYuv420pData(JNIEnv *env, jclass clazz, jobject byte_buffer_y,
                                 reinterpret_cast<unsigned char *>(p_argb_Data), width,
                                 height, flip_horizontal, rotate, pixFormat);
     } else {//NV21
-        int temp = pUData - pVData;
+        unsigned long temp = pUData - pVData;
         unsigned char *buffer = static_cast<unsigned char *>(malloc(yuvSize));
         //Continuous memory storage
         if (temp == 1) {
@@ -153,7 +153,17 @@ int pretreatmentYuv420pData(JNIEnv *env, jclass clazz, jobject byte_buffer_y,
                                      buffer + ySize, width / 2,
                                      buffer + ySize + ySize / 4, width / 2, width,
                                      height);
+        } else if (uBufferCapacity == vBufferCapacity && u_pixel_stride == v_pixel_stride &&
+                   u_pixel_stride == 2) {
+            ret = libyuv::NV21ToI420(reinterpret_cast<const uint8 *>(pYData), width,
+                                     reinterpret_cast<const uint8 *>(pVData), width,
+                                     buffer, width,
+                                     buffer + ySize, width / 2,
+                                     buffer + ySize + ySize / 4,
+                                     width / 2, width,
+                                     height);
         } else {
+            memcpy(buffer, pYData, ySize);
             unsigned char *tempUP = buffer + ySize;
             unsigned char *tempVP = buffer + ySize + ySize / 4;
             if (uBufferCapacity == vBufferCapacity && u_pixel_stride == v_pixel_stride) {
@@ -174,9 +184,13 @@ int pretreatmentYuv420pData(JNIEnv *env, jclass clazz, jobject byte_buffer_y,
                 }
             }
         }
-        int ret = handle_conversion(buffer, buffer + ySize + ySize / 4, buffer + ySize,
-                                    reinterpret_cast<unsigned char *>(p_argb_Data), width,
-                                    height, flip_horizontal, rotate, pixFormat);
+        if (ret < 0) {
+            BZLogUtil::logE("yuv ToI420 fail");
+            return ret;
+        }
+        ret = handle_conversion(buffer, buffer + ySize + ySize / 4, buffer + ySize,
+                                reinterpret_cast<unsigned char *>(p_argb_Data), width,
+                                height, flip_horizontal, rotate, pixFormat);
         free(buffer);
     }
     env->ReleaseByteArrayElements(out_date, p_argb_Data, JNI_FALSE);
