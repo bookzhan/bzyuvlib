@@ -26,7 +26,7 @@ public class BZYUVUtil {
             outDataRGBA = new byte[image.getWidth() * image.getHeight() * 4];
         }
         Image.Plane[] planes = image.getPlanes();
-        BZYUVUtil.yuv420pToRGBA(planes[0].getBuffer(), planes[1].getBuffer(), planes[1].getPixelStride(), planes[2].getBuffer(), planes[2].getPixelStride(), outDataRGBA, image.getWidth(), image.getHeight(), flipHorizontal, rotate);
+        BZYUVUtil.yuv420pToRGBA(planes[0].getBuffer(), planes[0].getRowStride(), planes[1].getBuffer(), planes[1].getPixelStride(), planes[1].getRowStride(), planes[2].getBuffer(), planes[2].getPixelStride(), planes[2].getRowStride(), outDataRGBA, image.getWidth(), image.getHeight(), flipHorizontal, rotate);
         return outDataRGBA;
     }
 
@@ -38,13 +38,13 @@ public class BZYUVUtil {
             outDataBGRA = new byte[image.getWidth() * image.getHeight() * 4];
         }
         Image.Plane[] planes = image.getPlanes();
-        BZYUVUtil.yuv420pToBGRA(planes[0].getBuffer(), planes[1].getBuffer(), planes[1].getPixelStride(), planes[2].getBuffer(), planes[2].getPixelStride(), outDataBGRA, image.getWidth(), image.getHeight(), flipHorizontal, rotate);
+        BZYUVUtil.yuv420pToBGRA(planes[0].getBuffer(), planes[0].getRowStride(), planes[1].getBuffer(), planes[1].getPixelStride(), planes[1].getRowStride(), planes[2].getBuffer(), planes[2].getPixelStride(), planes[2].getRowStride(), outDataBGRA, image.getWidth(), image.getHeight(), flipHorizontal, rotate);
         return outDataBGRA;
     }
 
-    public static native int yuv420pToRGBA(ByteBuffer byteBufferY, ByteBuffer byteBufferU, int uPixelStride, ByteBuffer byteBufferV, int vPixelStride, byte[] outDate, int width, int height, boolean flipHorizontal, int rotate);
+    public static native int yuv420pToRGBA(ByteBuffer byteBufferY, int yRowStride, ByteBuffer byteBufferU, int uPixelStride, int uRowStride, ByteBuffer byteBufferV, int vPixelStride, int vRowStride, byte[] outDate, int width, int height, boolean flipHorizontal, int rotate);
 
-    public static native int yuv420pToBGRA(ByteBuffer byteBufferY, ByteBuffer byteBufferU, int uPixelStride, ByteBuffer byteBufferV, int vPixelStride, byte[] outDate, int width, int height, boolean flipHorizontal, int rotate);
+    public static native int yuv420pToBGRA(ByteBuffer byteBufferY, int yRowStride, ByteBuffer byteBufferU, int uPixelStride, int uRowStride, ByteBuffer byteBufferV, int vPixelStride, int vRowStride, byte[] outDate, int width, int height, boolean flipHorizontal, int rotate);
 
     public static native int yv12ToRGBA(byte[] yv12, byte[] outDate, int width, int height, boolean flipHorizontal, int rotate);
 
