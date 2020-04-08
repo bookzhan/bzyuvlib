@@ -17,6 +17,7 @@ public class BZYUVUtil {
 
     private byte[] outDataRGBA = null;
     private byte[] outDataBGRA = null;
+    private byte[] outYUV420 = null;
 
     public byte[] yuv420pToRGBA(Image image, boolean flipHorizontal, int rotate) {
         if (null == image || Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
@@ -41,6 +42,20 @@ public class BZYUVUtil {
         BZYUVUtil.yuv420pToBGRA(planes[0].getBuffer(), planes[0].getRowStride(), planes[1].getBuffer(), planes[1].getPixelStride(), planes[1].getRowStride(), planes[2].getBuffer(), planes[2].getPixelStride(), planes[2].getRowStride(), outDataBGRA, image.getWidth(), image.getHeight(), flipHorizontal, rotate);
         return outDataBGRA;
     }
+
+    public byte[] preHandleYUV420p(Image image, boolean flipHorizontal, int rotate) {
+        if (null == image || Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
+            return null;
+        }
+        if (null == outYUV420) {
+            outYUV420 = new byte[image.getWidth() * image.getHeight() * 3 / 2];
+        }
+        Image.Plane[] planes = image.getPlanes();
+        BZYUVUtil.preHandleYUV420p(planes[0].getBuffer(), planes[0].getRowStride(), planes[1].getBuffer(), planes[1].getPixelStride(), planes[1].getRowStride(), planes[2].getBuffer(), planes[2].getPixelStride(), planes[2].getRowStride(), outYUV420, image.getWidth(), image.getHeight(), flipHorizontal, rotate);
+        return outYUV420;
+    }
+
+    public static native int preHandleYUV420p(ByteBuffer byteBufferY, int yRowStride, ByteBuffer byteBufferU, int uPixelStride, int uRowStride, ByteBuffer byteBufferV, int vPixelStride, int vRowStride, byte[] outDate, int width, int height, boolean flipHorizontal, int rotate);
 
     public static native int yuv420pToRGBA(ByteBuffer byteBufferY, int yRowStride, ByteBuffer byteBufferU, int uPixelStride, int uRowStride, ByteBuffer byteBufferV, int vPixelStride, int vRowStride, byte[] outDate, int width, int height, boolean flipHorizontal, int rotate);
 

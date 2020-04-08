@@ -23,6 +23,7 @@ public class Camera2Activity extends AppCompatActivity {
     private Bitmap bitmap;
     private long spaceTime;
     private int index;
+    private byte[] tempRgbaData = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,21 +42,26 @@ public class Camera2Activity extends AppCompatActivity {
             @Override
             public void onImageAvailable(Image image, int displayOrientation, float fps) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                    long startTime = System.currentTimeMillis();
-                    byte[] bytes = bzyuvUtil.yuv420pToRGBA(image, true, displayOrientation);
                     int height = image.getHeight();
                     int width = image.getWidth();
+                    if (displayOrientation == 270 || displayOrientation == 90) {
+                        width = image.getHeight();
+                        height = image.getWidth();
+                    }
+                    if (null == tempRgbaData) {
+                        tempRgbaData = new byte[width * height * 4];
+                    }
+                    long startTime = System.currentTimeMillis();
+                    byte[] preHandleYUV420p = bzyuvUtil.preHandleYUV420p(image, true, displayOrientation);
+                    BZYUVUtil.yv12ToRGBA(preHandleYUV420p, tempRgbaData, width, height, false, 0);
+
                     spaceTime += (System.currentTimeMillis() - startTime);
                     index++;
                     Log.d(TAG, "平均 yuv转换 耗时=" + (spaceTime / index) + " bitmap.width=" + width + " height=" + height);
                     if (null == bitmap) {
-                        if (displayOrientation == 270 || displayOrientation == 90) {
-                            bitmap = Bitmap.createBitmap(height, width, Bitmap.Config.ARGB_8888);
-                        } else {
-                            bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-                        }
+                        bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
                     }
-                    bitmap.copyPixelsFromBuffer(ByteBuffer.wrap(bytes));
+                    bitmap.copyPixelsFromBuffer(ByteBuffer.wrap(tempRgbaData));
                     iv_preview.post(new Runnable() {
                         @Override
                         public void run() {

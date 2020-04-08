@@ -5,7 +5,7 @@
 #include "bz_time.h"
 
 enum Pix_Format {
-    RGBA, BGRA
+    RGBA, BGRA, YUV420
 };
 
 int
@@ -79,6 +79,10 @@ handle_conversion(unsigned char *yData, unsigned char *uData, unsigned char *vDa
                            finalVData, targetWidth / 2,
                            outData, targetWidth * 4,
                            targetWidth, targetHeight);
+    } else if (pixFormat == Pix_Format::YUV420) {
+        memcpy(outData, finalYData, ySize);
+        memcpy(outData + ySize, finalUData, ySize / 4);
+        memcpy(outData + ySize + ySize / 4, finalVData, ySize / 4);
     }
     if (nullptr != mirror_i420_data) {
         free(mirror_i420_data);
@@ -226,6 +230,20 @@ Java_com_luoye_bzyuvlib_BZYUVUtil_yuv420pToBGRA(JNIEnv *env, jclass clazz, jobje
                                    u_pixel_stride, u_row_stride,
                                    byte_buffer_v, v_pixel_stride, v_row_stride, out_date, width,
                                    height, flip_horizontal, rotate, Pix_Format::BGRA);
+}
+extern "C"
+JNIEXPORT jint JNICALL
+Java_com_luoye_bzyuvlib_BZYUVUtil_preHandleYUV420p(JNIEnv *env, jclass clazz, jobject byte_buffer_y,
+                                                   jint y_row_stride, jobject byte_buffer_u,
+                                                   jint u_pixel_stride, jint u_row_stride,
+                                                   jobject byte_buffer_v, jint v_pixel_stride,
+                                                   jint v_row_stride, jbyteArray out_date,
+                                                   jint width, jint height,
+                                                   jboolean flip_horizontal, jint rotate) {
+    return pretreatmentYuv420pData(env, clazz, byte_buffer_y, y_row_stride, byte_buffer_u,
+                                   u_pixel_stride, u_row_stride,
+                                   byte_buffer_v, v_pixel_stride, v_row_stride, out_date, width,
+                                   height, flip_horizontal, rotate, Pix_Format::YUV420);
 }
 
 int pretreatmentYU12Data(JNIEnv *env, jclass clazz, jbyteArray yv12_,
