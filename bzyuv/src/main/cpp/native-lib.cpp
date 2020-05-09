@@ -123,7 +123,7 @@ int pretreatmentYuv420pData(JNIEnv *env, jclass clazz, jobject byte_buffer_y, in
         BZLogUtil::logE("Get VData return null");
         return -1;
     }
-    auto *p_argb_Data = env->GetByteArrayElements(out_date, JNI_FALSE);
+    auto *p_out_date = env->GetByteArrayElements(out_date, JNI_FALSE);
 
     int ySize = width * height;
     int yuvSize = ySize * 3 / 2;
@@ -136,7 +136,7 @@ int pretreatmentYuv420pData(JNIEnv *env, jclass clazz, jobject byte_buffer_y, in
         ret = handle_conversion(reinterpret_cast<unsigned char *>(pYData),
                                 reinterpret_cast<unsigned char *>(pVData),
                                 reinterpret_cast<unsigned char *>(pUData),
-                                reinterpret_cast<unsigned char *>(p_argb_Data), width,
+                                reinterpret_cast<unsigned char *>(p_out_date), width,
                                 height, flip_horizontal, rotate, pixFormat);
     } else {//NV21
         unsigned long temp = pUData - pVData;
@@ -194,12 +194,12 @@ int pretreatmentYuv420pData(JNIEnv *env, jclass clazz, jobject byte_buffer_y, in
             return ret;
         }
         ret = handle_conversion(buffer, buffer + ySize + ySize / 4, buffer + ySize,
-                                reinterpret_cast<unsigned char *>(p_argb_Data), width,
+                                reinterpret_cast<unsigned char *>(p_out_date), width,
                                 height, flip_horizontal, rotate, pixFormat);
         free(buffer);
     }
-    env->ReleaseByteArrayElements(out_date, p_argb_Data, JNI_FALSE);
-    return 0;
+    env->ReleaseByteArrayElements(out_date, p_out_date, JNI_FALSE);
+    return ret;
 }
 
 extern "C"
