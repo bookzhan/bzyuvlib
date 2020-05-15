@@ -1,6 +1,8 @@
 package com.luoye.bzyuvlib;
 
+import android.annotation.TargetApi;
 import android.graphics.Bitmap;
+import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraDevice;
 import android.media.Image;
 import android.os.Build;
@@ -14,7 +16,7 @@ import com.luoye.bzcamera.BZCamera2View;
 
 import java.nio.ByteBuffer;
 
-
+@TargetApi(android.os.Build.VERSION_CODES.LOLLIPOP)
 public class Camera2Activity extends AppCompatActivity {
     private static final String TAG = "bz_Camera2Activity";
     private BZCamera2View bz_camera2_view;
@@ -23,7 +25,6 @@ public class Camera2Activity extends AppCompatActivity {
     private Bitmap bitmap;
     private long spaceTime;
     private int index;
-    private byte[] tempRgbaData = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,12 +49,9 @@ public class Camera2Activity extends AppCompatActivity {
                         width = image.getHeight();
                         height = image.getWidth();
                     }
-                    if (null == tempRgbaData) {
-                        tempRgbaData = new byte[width * height * 4];
-                    }
+
                     long startTime = System.currentTimeMillis();
-                    byte[] preHandleYUV420p = bzyuvUtil.preHandleYUV420p(image, true, displayOrientation);
-                    BZYUVUtil.yv12ToRGBA(preHandleYUV420p, tempRgbaData, width, height, false, 0);
+                    byte[] pixData = bzyuvUtil.yuv420pToRGBA(image, bz_camera2_view.getCurrentCameraLensFacing() == CameraCharacteristics.LENS_FACING_FRONT, displayOrientation);
 
                     spaceTime += (System.currentTimeMillis() - startTime);
                     index++;
@@ -61,7 +59,7 @@ public class Camera2Activity extends AppCompatActivity {
                     if (null == bitmap) {
                         bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
                     }
-                    bitmap.copyPixelsFromBuffer(ByteBuffer.wrap(tempRgbaData));
+                    bitmap.copyPixelsFromBuffer(ByteBuffer.wrap(pixData));
                     iv_preview.post(new Runnable() {
                         @Override
                         public void run() {

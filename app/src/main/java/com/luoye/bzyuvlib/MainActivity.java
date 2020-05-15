@@ -58,7 +58,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void Camera2Activity(View view) {
-        startActivity(new Intent(this, Camera2Activity.class));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            startActivity(new Intent(this, Camera2Activity.class));
+        }
     }
 
     public void CameraActivity(View view) {
