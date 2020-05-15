@@ -8,7 +8,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Camera Image" />
+        android:text="Src Camera Image" />
 
     <com.luoye.bzcamera.BZCamera2View
         android:id="@+id/bz_camera2_view"
