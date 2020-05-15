@@ -16,7 +16,7 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity {
 
 
-    private String TAG = "bz_MainActivity";
+    private static final String TAG = "bz_MainActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,7 +32,6 @@ public class MainActivity extends AppCompatActivity {
 
     private boolean requestPermission() {
         ArrayList<String> permissionList = new ArrayList<>();
-        //内存卡权限
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN && !PermissionUtil.isPermissionGranted(this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
             permissionList.add(Manifest.permission.READ_EXTERNAL_STORAGE);
         }
@@ -53,14 +52,13 @@ public class MainActivity extends AppCompatActivity {
             PermissionUtil.requestPermission(this, permissionStrings, PermissionUtil.CODE_REQ_PERMISSION);
             return false;
         } else {
-            Log.d(TAG, "所要的权限全都有了");
+            Log.d(TAG, "All the required permissions are available");
             return true;
         }
     }
 
     public void Camera2Activity(View view) {
         startActivity(new Intent(this, Camera2Activity.class));
-//        BZYUVUtil.test();
     }
 
     public void CameraActivity(View view) {

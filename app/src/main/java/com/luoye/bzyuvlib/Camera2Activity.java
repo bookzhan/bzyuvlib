@@ -57,7 +57,7 @@ public class Camera2Activity extends AppCompatActivity {
 
                     spaceTime += (System.currentTimeMillis() - startTime);
                     index++;
-                    Log.d(TAG, "平均 yuv转换 耗时=" + (spaceTime / index) + " bitmap.width=" + width + " height=" + height);
+                    Log.d(TAG, "time cost=" + (spaceTime / index) + " bitmap.width=" + width + " height=" + height);
                     if (null == bitmap) {
                         bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
                     }

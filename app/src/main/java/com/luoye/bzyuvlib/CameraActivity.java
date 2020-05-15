@@ -15,6 +15,7 @@ import com.luoye.bzcamera.listener.CameraStateListener;
 import java.nio.ByteBuffer;
 
 public class CameraActivity extends AppCompatActivity {
+    private static final String TAG = "bz_CameraActivity";
 
     private BZCameraView bz_camera_view;
     private ImageView bz_image_view;
@@ -56,7 +57,7 @@ public class CameraActivity extends AppCompatActivity {
                 long startTime = System.currentTimeMillis();
                 BZYUVUtil.nv21ToRGBA(data, argbByteBuffer, width, height, cameraId == Camera.CameraInfo.CAMERA_FACING_FRONT, displayOrientation);
                 totalTime += (System.currentTimeMillis() - startTime);
-                Log.d("bz_yuv转换", "耗时=" + (totalTime / index));
+                Log.d(TAG, "time cost=" + (totalTime / index));
 
                 if (null == bitmap) {
                     if (displayOrientation == 270 || displayOrientation == 90) {
