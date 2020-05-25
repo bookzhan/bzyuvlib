@@ -29,3 +29,8 @@ allprojects {
 
 
 If it helps you, please give me a start
+
+
+
+[中文文档（Chinese DOC）](https://github.com/bookzhan/bzyuvlib/blob/master/README_cn.md)
+
