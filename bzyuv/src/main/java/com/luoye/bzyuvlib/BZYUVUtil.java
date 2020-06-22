@@ -18,13 +18,17 @@ public class BZYUVUtil {
     private byte[] outDataRGBA = null;
     private byte[] outDataBGRA = null;
     private byte[] outYUV420 = null;
+    private int lastWidth = 0;
+    private int lastHeight = 0;
 
     public byte[] yuv420pToRGBA(Image image, boolean flipHorizontal, int rotate) {
         if (null == image || Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
             return null;
         }
-        if (null == outDataRGBA) {
+        if (null == outDataRGBA || image.getWidth() != lastWidth || image.getHeight() != lastHeight) {
             outDataRGBA = new byte[image.getWidth() * image.getHeight() * 4];
+            lastWidth = image.getWidth();
+            lastHeight = image.getHeight();
         }
         Image.Plane[] planes = image.getPlanes();
         BZYUVUtil.yuv420pToRGBA(planes[0].getBuffer(), planes[0].getRowStride(), planes[1].getBuffer(), planes[1].getPixelStride(), planes[1].getRowStride(), planes[2].getBuffer(), planes[2].getPixelStride(), planes[2].getRowStride(), outDataRGBA, image.getWidth(), image.getHeight(), flipHorizontal, rotate);
@@ -35,8 +39,10 @@ public class BZYUVUtil {
         if (null == image || Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
             return null;
         }
-        if (null == outDataBGRA) {
+        if (null == outDataBGRA || image.getWidth() != lastWidth || image.getHeight() != lastHeight) {
             outDataBGRA = new byte[image.getWidth() * image.getHeight() * 4];
+            lastWidth = image.getWidth();
+            lastHeight = image.getHeight();
         }
         Image.Plane[] planes = image.getPlanes();
         BZYUVUtil.yuv420pToBGRA(planes[0].getBuffer(), planes[0].getRowStride(), planes[1].getBuffer(), planes[1].getPixelStride(), planes[1].getRowStride(), planes[2].getBuffer(), planes[2].getPixelStride(), planes[2].getRowStride(), outDataBGRA, image.getWidth(), image.getHeight(), flipHorizontal, rotate);
@@ -47,8 +53,10 @@ public class BZYUVUtil {
         if (null == image || Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
             return null;
         }
-        if (null == outYUV420) {
+        if (null == outYUV420 || image.getWidth() != lastWidth || image.getHeight() != lastHeight) {
             outYUV420 = new byte[image.getWidth() * image.getHeight() * 3 / 2];
+            lastWidth = image.getWidth();
+            lastHeight = image.getHeight();
         }
         Image.Plane[] planes = image.getPlanes();
         BZYUVUtil.preHandleYUV420p(planes[0].getBuffer(), planes[0].getRowStride(), planes[1].getBuffer(), planes[1].getPixelStride(), planes[1].getRowStride(), planes[2].getBuffer(), planes[2].getPixelStride(), planes[2].getRowStride(), outYUV420, image.getWidth(), image.getHeight(), flipHorizontal, rotate);

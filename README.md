@@ -24,7 +24,7 @@ allprojects {
 }
 ```
 
-##### 2.implementation 'com.luoye.bzlib:bzyuv:1.1.9'
+##### 2.implementation 'com.luoye.bzlib:bzyuv:1.1.10'
 
 
 

@@ -139,7 +139,7 @@ int pretreatmentYuv420pData(JNIEnv *env, jclass clazz, jobject byte_buffer_y, in
                                 reinterpret_cast<unsigned char *>(p_out_date), width,
                                 height, flip_horizontal, rotate, pixFormat);
     } else {//NV21
-        unsigned long temp = pUData - pVData;
+        long temp = pUData - pVData;
         unsigned char *buffer = static_cast<unsigned char *>(malloc(yuvSize));
         //Continuous memory storage
         if (temp == 1) {
