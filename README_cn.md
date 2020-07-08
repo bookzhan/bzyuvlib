@@ -4,6 +4,7 @@
 2. preHandleYUV420p
 3. yv12ToRGBA/yv12ToBGRA
 4. nv21ToRGBA/nv21ToBGRA
+5. cropNV21/cropYUV420
 
 
 
@@ -24,7 +25,7 @@ allprojects {
 }
 ```
 
-##### 2.然后implementation 'com.luoye.bzlib:bzyuv:1.1.10'
+##### 2.然后implementation 'com.luoye.bzlib:bzyuv:1.1.11'
 
 
 
