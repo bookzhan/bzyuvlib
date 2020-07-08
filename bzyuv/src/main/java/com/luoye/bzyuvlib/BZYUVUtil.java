@@ -49,7 +49,7 @@ public class BZYUVUtil {
         return outDataBGRA;
     }
 
-    public byte[] preHandleYUV420p(Image image, boolean flipHorizontal, int rotate) {
+    public byte[] preHandleYUV420(Image image, boolean flipHorizontal, int rotate) {
         if (null == image || Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
             return null;
         }
@@ -59,11 +59,11 @@ public class BZYUVUtil {
             lastHeight = image.getHeight();
         }
         Image.Plane[] planes = image.getPlanes();
-        BZYUVUtil.preHandleYUV420p(planes[0].getBuffer(), planes[0].getRowStride(), planes[1].getBuffer(), planes[1].getPixelStride(), planes[1].getRowStride(), planes[2].getBuffer(), planes[2].getPixelStride(), planes[2].getRowStride(), outYUV420, image.getWidth(), image.getHeight(), flipHorizontal, rotate);
+        BZYUVUtil.preHandleYUV420(planes[0].getBuffer(), planes[0].getRowStride(), planes[1].getBuffer(), planes[1].getPixelStride(), planes[1].getRowStride(), planes[2].getBuffer(), planes[2].getPixelStride(), planes[2].getRowStride(), outYUV420, image.getWidth(), image.getHeight(), flipHorizontal, rotate);
         return outYUV420;
     }
 
-    public static native int preHandleYUV420p(ByteBuffer byteBufferY, int yRowStride, ByteBuffer byteBufferU, int uPixelStride, int uRowStride, ByteBuffer byteBufferV, int vPixelStride, int vRowStride, byte[] outDate, int width, int height, boolean flipHorizontal, int rotate);
+    public static native int preHandleYUV420(ByteBuffer byteBufferY, int yRowStride, ByteBuffer byteBufferU, int uPixelStride, int uRowStride, ByteBuffer byteBufferV, int vPixelStride, int vRowStride, byte[] outDate, int width, int height, boolean flipHorizontal, int rotate);
 
     public static native int yuv420pToRGBA(ByteBuffer byteBufferY, int yRowStride, ByteBuffer byteBufferU, int uPixelStride, int uRowStride, ByteBuffer byteBufferV, int vPixelStride, int vRowStride, byte[] outDate, int width, int height, boolean flipHorizontal, int rotate);
 
@@ -76,5 +76,24 @@ public class BZYUVUtil {
     public static native int nv21ToRGBA(byte[] nv21, byte[] outDate, int width, int height, boolean flipHorizontal, int rotate);
 
     public static native int nv21ToBGRA(byte[] nv21, byte[] outDate, int width, int height, boolean flipHorizontal, int rotate);
+
+    public static native int yuv420ToRGBA(byte[] yuv420, byte[] outDate, int width, int height, boolean flipHorizontal, int rotate);
+
+    public static native int yuv420ToBGRA(byte[] yuv420, byte[] outDate, int width, int height, boolean flipHorizontal, int rotate);
+
+    /**
+     * @param outDate YUV420
+     */
+    public static native int preHandleNV21(byte[] nv21, byte[] outDate, int width, int height, boolean flipHorizontal, int rotate);
+
+    /**
+     * @param outDate YUV420
+     */
+    public static native int preHandleYV12(byte[] yv12, byte[] outDate, int width, int height, boolean flipHorizontal, int rotate);
+
+
+    public static native int cropNV21(byte src[], byte dis[], int srcWidth, int srcHeight, int startX, int startY, int disWidth, int disHeight);
+
+    public static native int cropYUV420(byte src[], byte dis[], int srcWidth, int srcHeight, int startX, int startY, int disWidth, int disHeight);
 
 }

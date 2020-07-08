@@ -66,4 +66,12 @@ public class MainActivity extends AppCompatActivity {
     public void CameraActivity(View view) {
         startActivity(new Intent(this, CameraActivity.class));
     }
+
+    public void Camera1YUVCropActivity(View view) {
+        startActivity(new Intent(this, Camera1YUVCropActivity.class));
+    }
+
+    public void Camera2YUVCropActivity(View view) {
+        startActivity(new Intent(this, Camera2YUVCropActivity.class));
+    }
 }
