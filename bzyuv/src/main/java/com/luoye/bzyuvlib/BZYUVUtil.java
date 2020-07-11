@@ -82,12 +82,12 @@ public class BZYUVUtil {
     public static native int yuv420ToBGRA(byte[] yuv420, byte[] outDate, int width, int height, boolean flipHorizontal, int rotate);
 
     /**
-     * @param outDate YUV420
+     * @param outDate YUVI420
      */
     public static native int preHandleNV21(byte[] nv21, byte[] outDate, int width, int height, boolean flipHorizontal, int rotate);
 
     /**
-     * @param outDate YUV420
+     * @param outDate YUVI420
      */
     public static native int preHandleYV12(byte[] yv12, byte[] outDate, int width, int height, boolean flipHorizontal, int rotate);
 
@@ -95,5 +95,7 @@ public class BZYUVUtil {
     public static native int cropNV21(byte src[], byte dis[], int srcWidth, int srcHeight, int startX, int startY, int disWidth, int disHeight);
 
     public static native int cropYUV420(byte src[], byte dis[], int srcWidth, int srcHeight, int startX, int startY, int disWidth, int disHeight);
+
+    public static native int zoomYUV420(byte src[], byte dis[], int srcWidth, int srcHeight, int disWidth, int disHeight);
 
 }

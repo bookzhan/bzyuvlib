@@ -21,11 +21,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
-        android:text="Zoom Image" />
+        android:text="YUV2RGBA Image" />
 
     <ImageView
         android:id="@+id/bz_image_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_width="480px"
+        android:layout_height="640px" />
 
 </LinearLayout>

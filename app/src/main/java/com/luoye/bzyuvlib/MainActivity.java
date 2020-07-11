@@ -74,4 +74,8 @@ public class MainActivity extends AppCompatActivity {
     public void Camera2YUVCropActivity(View view) {
         startActivity(new Intent(this, Camera2YUVCropActivity.class));
     }
+
+    public void zoomYUV(View view) {
+        startActivity(new Intent(this, ZoomYUVActivity.class));
+    }
 }

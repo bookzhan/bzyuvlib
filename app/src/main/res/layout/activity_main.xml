@@ -46,5 +46,15 @@
         android:text="Camera2YUVCropActivity"
         android:textAllCaps="false" />
 
+     <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="30dp"
+        android:onClick="zoomYUV"
+        android:text="zoomYUV"
+        android:textAllCaps="false" />
+
+
 
 </LinearLayout>

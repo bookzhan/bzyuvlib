@@ -577,3 +577,37 @@ Java_com_luoye_bzyuvlib_BZYUVUtil_preHandleYV12(JNIEnv *env, jclass clazz, jbyte
     return pretreatmentYV12Data(env, clazz, yv12, out_date, width, height, flip_horizontal, rotate,
                                 Pix_Format::YUV420);
 }
+extern "C"
+JNIEXPORT jint JNICALL
+Java_com_luoye_bzyuvlib_BZYUVUtil_zoomYUV420(JNIEnv *env, jclass clazz, jbyteArray src_,
+                                             jbyteArray dis_, jint src_width, jint src_height,
+                                             jint dis_width, jint dis_height) {
+    if (src_width <= 0 || src_height <= 0 || dis_width <= 0 || dis_height <= 0) {
+        return -1;
+    }
+    jbyte *data_yuv = env->GetByteArrayElements(src_, nullptr);
+    if (nullptr == data_yuv) {
+        BZLogUtil::logE("nullptr == data_yuv");
+        return -1;
+    }
+    auto *yuv_dis = env->GetByteArrayElements(dis_, JNI_FALSE);
+    if (nullptr == yuv_dis) {
+        BZLogUtil::logE("Get p_byte_buffer return null");
+        return -1;
+    }
+    int64_t ySrcSize = src_width * src_height;
+    int64_t yDisSize = dis_width * dis_height;
+    int ret = libyuv::I420Scale(reinterpret_cast<const uint8 *>(data_yuv), src_width,
+                                reinterpret_cast<const uint8 *>(data_yuv + ySrcSize),
+                                src_width >> 1,
+                                reinterpret_cast<const uint8 *>(data_yuv + ySrcSize + ySrcSize / 4),
+                                src_width >> 1,
+                                src_width, src_height,
+                                reinterpret_cast<uint8 *>(yuv_dis), dis_width,
+                                reinterpret_cast<uint8 *>(yuv_dis + yDisSize), dis_width >> 1,
+                                reinterpret_cast<uint8 *>(yuv_dis + yDisSize + yDisSize / 4),
+                                dis_width >> 1,
+                                dis_width, dis_height, libyuv::FilterMode::kFilterNone);
+
+    return ret;
+}
