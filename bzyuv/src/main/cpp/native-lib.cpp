@@ -146,8 +146,8 @@ int pretreatmentYuv420pData(JNIEnv *env, jclass clazz, jobject byte_buffer_y, in
         unsigned char *buffer = static_cast<unsigned char *>(malloc(yuvSize));
         //Continuous memory storage
         if (temp == 1) {
-            ret = libyuv::NV21ToI420(reinterpret_cast<const uint8 *>(pYData), yRowStride,
-                                     reinterpret_cast<const uint8 *>(pVData),
+            ret = libyuv::NV21ToI420(reinterpret_cast<const uint8_t *>(pYData), yRowStride,
+                                     reinterpret_cast<const uint8_t *>(pVData),
                                      vRowStride,
                                      buffer, width,
                                      buffer + ySize, width / 2,
@@ -155,16 +155,16 @@ int pretreatmentYuv420pData(JNIEnv *env, jclass clazz, jobject byte_buffer_y, in
                                      width / 2, width,
                                      height);
         } else if (temp == -1) {
-            ret = libyuv::NV21ToI420(reinterpret_cast<const uint8 *>(pYData), yRowStride,
-                                     reinterpret_cast<const uint8 *>(pUData), vRowStride,
+            ret = libyuv::NV21ToI420(reinterpret_cast<const uint8_t *>(pYData), yRowStride,
+                                     reinterpret_cast<const uint8_t *>(pUData), vRowStride,
                                      buffer, width,
                                      buffer + ySize, width / 2,
                                      buffer + ySize + ySize / 4, width / 2, width,
                                      height);
         } else if (uBufferCapacity == vBufferCapacity && u_pixel_stride == v_pixel_stride &&
                    u_pixel_stride == 2) {
-            ret = libyuv::NV21ToI420(reinterpret_cast<const uint8 *>(pYData), yRowStride,
-                                     reinterpret_cast<const uint8 *>(pVData), vRowStride,
+            ret = libyuv::NV21ToI420(reinterpret_cast<const uint8_t *>(pYData), yRowStride,
+                                     reinterpret_cast<const uint8_t *>(pVData), vRowStride,
                                      buffer, width,
                                      buffer + ySize, width / 2,
                                      buffer + ySize + ySize / 4,
@@ -332,8 +332,8 @@ int pretreatmentNV21Data(JNIEnv *env, jclass clazz, jbyteArray nv21_,
     int yuvSize = ySize * 3 / 2;
     unsigned char *buffer = static_cast<unsigned char *>(malloc(yuvSize));
 
-    int ret = libyuv::NV21ToI420(reinterpret_cast<const uint8 *>(data_nv21), width,
-                                 reinterpret_cast<const uint8 *>(data_nv21 + ySize), width,
+    int ret = libyuv::NV21ToI420(reinterpret_cast<const uint8_t *>(data_nv21), width,
+                                 reinterpret_cast<const uint8_t *>(data_nv21 + ySize), width,
                                  buffer, width,
                                  buffer + ySize, width / 2,
                                  buffer + ySize + ySize / 4,
@@ -598,15 +598,16 @@ Java_com_luoye_bzyuvlib_BZYUVUtil_zoomYUV420(JNIEnv *env, jclass clazz, jbyteArr
     }
     int64_t ySrcSize = src_width * src_height;
     int64_t yDisSize = dis_width * dis_height;
-    int ret = libyuv::I420Scale(reinterpret_cast<const uint8 *>(data_yuv), src_width,
-                                reinterpret_cast<const uint8 *>(data_yuv + ySrcSize),
+    int ret = libyuv::I420Scale(reinterpret_cast<const uint8_t *>(data_yuv), src_width,
+                                reinterpret_cast<const uint8_t *>(data_yuv + ySrcSize),
                                 src_width >> 1,
-                                reinterpret_cast<const uint8 *>(data_yuv + ySrcSize + ySrcSize / 4),
+                                reinterpret_cast<const uint8_t *>(data_yuv + ySrcSize +
+                                                                  ySrcSize / 4),
                                 src_width >> 1,
                                 src_width, src_height,
-                                reinterpret_cast<uint8 *>(yuv_dis), dis_width,
-                                reinterpret_cast<uint8 *>(yuv_dis + yDisSize), dis_width >> 1,
-                                reinterpret_cast<uint8 *>(yuv_dis + yDisSize + yDisSize / 4),
+                                reinterpret_cast<uint8_t *>(yuv_dis), dis_width,
+                                reinterpret_cast<uint8_t *>(yuv_dis + yDisSize), dis_width >> 1,
+                                reinterpret_cast<uint8_t *>(yuv_dis + yDisSize + yDisSize / 4),
                                 dis_width >> 1,
                                 dis_width, dis_height, libyuv::FilterMode::kFilterNone);
 
@@ -644,17 +645,17 @@ Java_com_luoye_bzyuvlib_BZYUVUtil_bitmapToYUV420(JNIEnv *env, jclass clazz, jobj
     int dis_height = info.height;
     int64_t yDisSize = dis_width * dis_height;
     if (info.format == AndroidBitmapFormat::ANDROID_BITMAP_FORMAT_RGBA_8888) {
-        ret = libyuv::ABGRToI420(reinterpret_cast<const uint8 *>(pixels_color), dis_width * 4,
-                                 reinterpret_cast<uint8 *>(yuv_dis), dis_width,
-                                 reinterpret_cast<uint8 *>(yuv_dis + yDisSize), dis_width >> 1,
-                                 reinterpret_cast<uint8 *>(yuv_dis + yDisSize + yDisSize / 4),
+        ret = libyuv::ABGRToI420(reinterpret_cast<const uint8_t *>(pixels_color), dis_width * 4,
+                                 reinterpret_cast<uint8_t *>(yuv_dis), dis_width,
+                                 reinterpret_cast<uint8_t *>(yuv_dis + yDisSize), dis_width >> 1,
+                                 reinterpret_cast<uint8_t *>(yuv_dis + yDisSize + yDisSize / 4),
                                  dis_width >> 1,
                                  dis_width, dis_height);
     } else if (info.format == AndroidBitmapFormat::ANDROID_BITMAP_FORMAT_RGB_565) {
-        ret = libyuv::RGB565ToI420(reinterpret_cast<const uint8 *>(pixels_color), dis_width * 2,
-                                   reinterpret_cast<uint8 *>(yuv_dis), dis_width,
-                                   reinterpret_cast<uint8 *>(yuv_dis + yDisSize), dis_width >> 1,
-                                   reinterpret_cast<uint8 *>(yuv_dis + yDisSize + yDisSize / 4),
+        ret = libyuv::RGB565ToI420(reinterpret_cast<const uint8_t *>(pixels_color), dis_width * 2,
+                                   reinterpret_cast<uint8_t *>(yuv_dis), dis_width,
+                                   reinterpret_cast<uint8_t *>(yuv_dis + yDisSize), dis_width >> 1,
+                                   reinterpret_cast<uint8_t *>(yuv_dis + yDisSize + yDisSize / 4),
                                    dis_width >> 1,
                                    dis_width, dis_height);
     } else {

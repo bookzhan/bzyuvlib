@@ -31,7 +31,7 @@ public class ZoomYUVActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_camera);
+        setContentView(R.layout.activity_zoom_yuv);
         bz_camera_view = findViewById(R.id.bz_camera_view);
         bz_camera_view.setPreviewTargetSize(480, 640);
         bz_image_view = findViewById(R.id.bz_image_view);
