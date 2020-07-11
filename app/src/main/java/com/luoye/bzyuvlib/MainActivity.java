@@ -78,4 +78,8 @@ public class MainActivity extends AppCompatActivity {
     public void zoomYUV(View view) {
         startActivity(new Intent(this, ZoomYUVActivity.class));
     }
+
+    public void Bitmap2YUVActivity(View view) {
+        startActivity(new Intent(this, Bitmap2YUVActivity.class));
+    }
 }

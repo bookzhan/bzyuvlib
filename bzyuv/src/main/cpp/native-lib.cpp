@@ -3,6 +3,7 @@
 #include "BZLogUtil.h"
 #include "include/libyuv.h"
 #include "bz_time.h"
+#include <android/bitmap.h>
 
 enum Pix_Format {
     RGBA, BGRA, YUV420
@@ -609,5 +610,59 @@ Java_com_luoye_bzyuvlib_BZYUVUtil_zoomYUV420(JNIEnv *env, jclass clazz, jbyteArr
                                 dis_width >> 1,
                                 dis_width, dis_height, libyuv::FilterMode::kFilterNone);
 
+    env->ReleaseByteArrayElements(src_, data_yuv, 0);
+    env->ReleaseByteArrayElements(dis_, yuv_dis, 0);
+    return ret;
+}
+extern "C"
+JNIEXPORT jint JNICALL
+Java_com_luoye_bzyuvlib_BZYUVUtil_bitmapToYUV420(JNIEnv *env, jclass clazz, jobject bitmap,
+                                                 jbyteArray dis_) {
+    if (nullptr == bitmap || nullptr == dis_) {
+        return -1;
+    }
+    auto *yuv_dis = env->GetByteArrayElements(dis_, JNI_FALSE);
+    if (nullptr == yuv_dis) {
+        BZLogUtil::logE("Get p_byte_buffer return null");
+        return -1;
+    }
+    int ret = 0;
+    void *pixels_color = NULL;
+
+    AndroidBitmapInfo info;
+    ret = AndroidBitmap_getInfo(env, bitmap, &info);
+    if (ret < 0) {
+        BZLogUtil::logE("AndroidBitmap_getInfo() failed ! error=%d", ret);
+        return ret;
+    }
+
+    if ((ret = AndroidBitmap_lockPixels(env, bitmap, &pixels_color)) < 0) {
+        BZLogUtil::logE("AndroidBitmap_lockPixels() failed ! error=%d", ret);
+        return ret;
+    }
+    int dis_width = info.width;
+    int dis_height = info.height;
+    int64_t yDisSize = dis_width * dis_height;
+    if (info.format == AndroidBitmapFormat::ANDROID_BITMAP_FORMAT_RGBA_8888) {
+        ret = libyuv::ABGRToI420(reinterpret_cast<const uint8 *>(pixels_color), dis_width * 4,
+                                 reinterpret_cast<uint8 *>(yuv_dis), dis_width,
+                                 reinterpret_cast<uint8 *>(yuv_dis + yDisSize), dis_width >> 1,
+                                 reinterpret_cast<uint8 *>(yuv_dis + yDisSize + yDisSize / 4),
+                                 dis_width >> 1,
+                                 dis_width, dis_height);
+    } else if (info.format == AndroidBitmapFormat::ANDROID_BITMAP_FORMAT_RGB_565) {
+        ret = libyuv::RGB565ToI420(reinterpret_cast<const uint8 *>(pixels_color), dis_width * 2,
+                                   reinterpret_cast<uint8 *>(yuv_dis), dis_width,
+                                   reinterpret_cast<uint8 *>(yuv_dis + yDisSize), dis_width >> 1,
+                                   reinterpret_cast<uint8 *>(yuv_dis + yDisSize + yDisSize / 4),
+                                   dis_width >> 1,
+                                   dis_width, dis_height);
+    } else {
+        BZLogUtil::logE("The format is not supported");
+    }
+
+
+    AndroidBitmap_unlockPixels(env, bitmap);
+    env->ReleaseByteArrayElements(dis_, yuv_dis, 0);
     return ret;
 }
