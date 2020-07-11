@@ -5,6 +5,8 @@
 3. yv12ToRGBA/yv12ToBGRA
 4. nv21ToRGBA/nv21ToBGRA
 5. cropNV21/cropYUV420
+6. zoomYUV420
+7. bitmapToYUV420
 
 
 
@@ -25,7 +27,7 @@ allprojects {
 }
 ```
 
-##### 2.然后implementation 'com.luoye.bzlib:bzyuv:1.1.11'
+##### 2.然后implementation 'com.luoye.bzlib:bzyuv:1.1.12'
 
 
 
