@@ -135,12 +135,20 @@ int pretreatmentYuv420pData(JNIEnv *env, jclass clazz, jobject byte_buffer_y, in
 
 
     int ret = 0;
-    if (u_pixel_stride == v_pixel_stride && u_pixel_stride == 1) {//YV12
-        ret = handle_conversion(reinterpret_cast<unsigned char *>(pYData),
-                                reinterpret_cast<unsigned char *>(pVData),
-                                reinterpret_cast<unsigned char *>(pUData),
+    if (u_pixel_stride == v_pixel_stride && u_pixel_stride == 1) {//YV21
+        unsigned char *buffer = static_cast<unsigned char *>(malloc(yuvSize));
+        libyuv::I420Copy(reinterpret_cast<const uint8_t *>(pYData), yRowStride,
+                         reinterpret_cast<const uint8_t *>(pUData), uRowStride,
+                         reinterpret_cast<const uint8_t *>(pVData), vRowStride,
+                         buffer, width,
+                         buffer + ySize, width / 2,
+                         buffer + ySize + ySize / 4, width / 2, width, height);
+        ret = handle_conversion(buffer,
+                                buffer + ySize,
+                                buffer + ySize + ySize / 4,
                                 reinterpret_cast<unsigned char *>(p_out_date), width,
                                 height, flip_horizontal, rotate, pixFormat);
+        free(buffer);
     } else {//NV21
         long temp = pUData - pVData;
         unsigned char *buffer = static_cast<unsigned char *>(malloc(yuvSize));
