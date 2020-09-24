@@ -64,6 +64,11 @@ public class BZYUVUtil {
         return outYUV420;
     }
 
+    public byte[] yuv420pToGray(Image image, boolean flipHorizontal, int rotate) {
+
+        return null;
+    }
+
     public static native int preHandleYUV420(ByteBuffer byteBufferY, int yRowStride, ByteBuffer byteBufferU, int uPixelStride, int uRowStride, ByteBuffer byteBufferV, int vPixelStride, int vRowStride, byte[] outDate, int width, int height, boolean flipHorizontal, int rotate);
 
     public static native int yuv420pToRGBA(ByteBuffer byteBufferY, int yRowStride, ByteBuffer byteBufferU, int uPixelStride, int uRowStride, ByteBuffer byteBufferV, int vPixelStride, int vRowStride, byte[] outDate, int width, int height, boolean flipHorizontal, int rotate);
@@ -81,6 +86,12 @@ public class BZYUVUtil {
     public static native int yuv420ToRGBA(byte[] yuv420, byte[] outDate, int width, int height, boolean flipHorizontal, int rotate);
 
     public static native int yuv420ToBGRA(byte[] yuv420, byte[] outDate, int width, int height, boolean flipHorizontal, int rotate);
+
+    public static native int yuv420ToGray(ByteBuffer byteBufferY, int yRowStride, ByteBuffer byteBufferU, int uPixelStride, int uRowStride, ByteBuffer byteBufferV, int vPixelStride, int vRowStride, byte[] outDate, int width, int height, boolean flipHorizontal, int rotate);
+
+    public static native int yv12ToGray(byte[] yv12, byte[] outDate, int width, int height, boolean flipHorizontal, int rotate);
+
+    public static native int nv21ToGray(byte[] nv21, byte[] outDate, int width, int height, boolean flipHorizontal, int rotate);
 
     /**
      * @param outDate YUVI420

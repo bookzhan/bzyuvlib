@@ -6,7 +6,7 @@
 #include <android/bitmap.h>
 
 enum Pix_Format {
-    RGBA, BGRA, YUV420
+    RGBA, BGRA, YUV420, GRAY
 };
 
 int
@@ -130,85 +130,21 @@ int pretreatmentYuv420pData(JNIEnv *env, jclass clazz, jobject byte_buffer_y, in
 
     int ySize = width * height;
     int yuvSize = ySize * 3 / 2;
-    jlong uBufferCapacity = env->GetDirectBufferCapacity(byte_buffer_u);
-    jlong vBufferCapacity = env->GetDirectBufferCapacity(byte_buffer_v);
+    unsigned char *buffer = static_cast<unsigned char *>(malloc(yuvSize));
+    libyuv::Android420ToI420(reinterpret_cast<const uint8_t *>(pYData), yRowStride,
+                             reinterpret_cast<const uint8_t *>(pUData), uRowStride,
+                             reinterpret_cast<const uint8_t *>(pVData), vRowStride,
+                             u_pixel_stride,
+                             buffer, width,
+                             buffer + ySize, width / 2,
+                             buffer + ySize + ySize / 4, width / 2, width, height);
 
-
-    int ret = 0;
-    if (u_pixel_stride == v_pixel_stride && u_pixel_stride == 1) {//YV21
-        unsigned char *buffer = static_cast<unsigned char *>(malloc(yuvSize));
-        libyuv::I420Copy(reinterpret_cast<const uint8_t *>(pYData), yRowStride,
-                         reinterpret_cast<const uint8_t *>(pUData), uRowStride,
-                         reinterpret_cast<const uint8_t *>(pVData), vRowStride,
-                         buffer, width,
-                         buffer + ySize, width / 2,
-                         buffer + ySize + ySize / 4, width / 2, width, height);
-        ret = handle_conversion(buffer,
-                                buffer + ySize,
-                                buffer + ySize + ySize / 4,
-                                reinterpret_cast<unsigned char *>(p_out_date), width,
-                                height, flip_horizontal, rotate, pixFormat);
-        free(buffer);
-    } else {//NV21
-        long temp = pUData - pVData;
-        unsigned char *buffer = static_cast<unsigned char *>(malloc(yuvSize));
-        //Continuous memory storage
-        if (temp == 1) {
-            ret = libyuv::NV21ToI420(reinterpret_cast<const uint8_t *>(pYData), yRowStride,
-                                     reinterpret_cast<const uint8_t *>(pVData),
-                                     vRowStride,
-                                     buffer, width,
-                                     buffer + ySize, width / 2,
-                                     buffer + ySize + ySize / 4,
-                                     width / 2, width,
-                                     height);
-        } else if (temp == -1) {
-            ret = libyuv::NV21ToI420(reinterpret_cast<const uint8_t *>(pYData), yRowStride,
-                                     reinterpret_cast<const uint8_t *>(pUData), vRowStride,
-                                     buffer, width,
-                                     buffer + ySize, width / 2,
-                                     buffer + ySize + ySize / 4, width / 2, width,
-                                     height);
-        } else if (uBufferCapacity == vBufferCapacity && u_pixel_stride == v_pixel_stride &&
-                   u_pixel_stride == 2) {
-            ret = libyuv::NV21ToI420(reinterpret_cast<const uint8_t *>(pYData), yRowStride,
-                                     reinterpret_cast<const uint8_t *>(pVData), vRowStride,
-                                     buffer, width,
-                                     buffer + ySize, width / 2,
-                                     buffer + ySize + ySize / 4,
-                                     width / 2, width,
-                                     height);
-        } else {
-            memcpy(buffer, pYData, ySize);
-            unsigned char *tempUP = buffer + ySize;
-            unsigned char *tempVP = buffer + ySize + ySize / 4;
-            if (uBufferCapacity == vBufferCapacity && u_pixel_stride == v_pixel_stride) {
-                for (int i = 0; i < uBufferCapacity; i += u_pixel_stride) {
-                    *tempUP = *(pUData + i);
-                    *tempVP = *(pVData + i);
-                    tempUP++;
-                    tempVP++;
-                }
-            } else {
-                for (int i = 0; i < uBufferCapacity; i += u_pixel_stride) {
-                    *tempUP = *(pUData + i);
-                    tempUP++;
-                }
-                for (int i = 0; i < vBufferCapacity; i += v_pixel_stride) {
-                    *tempVP = *(pVData + i);
-                    tempVP++;
-                }
-            }
-        }
-        if (ret < 0) {
-            BZLogUtil::logE("yuv ToI420 fail");
-            return ret;
-        }
-        ret = handle_conversion(buffer, buffer + ySize, buffer + ySize + ySize / 4,
-                                reinterpret_cast<unsigned char *>(p_out_date), width,
-                                height, flip_horizontal, rotate, pixFormat);
-        free(buffer);
-    }
+    int  ret = handle_conversion(buffer,
+                                      buffer + ySize,
+                                      buffer + ySize + ySize / 4,
+                                      reinterpret_cast<unsigned char *>(p_out_date), width,
+                                      height, flip_horizontal, rotate, pixFormat);;
+    free(buffer);
     env->ReleaseByteArrayElements(out_date, p_out_date, JNI_FALSE);
     return ret;
 }
@@ -674,4 +610,33 @@ Java_com_luoye_bzyuvlib_BZYUVUtil_bitmapToYUV420(JNIEnv *env, jclass clazz, jobj
     AndroidBitmap_unlockPixels(env, bitmap);
     env->ReleaseByteArrayElements(dis_, yuv_dis, 0);
     return ret;
+}
+extern "C"
+JNIEXPORT jint JNICALL
+Java_com_luoye_bzyuvlib_BZYUVUtil_yuv420ToGray(JNIEnv *env, jclass clazz, jobject byte_buffer_y,
+                                               jint y_row_stride, jobject byte_buffer_u,
+                                               jint u_pixel_stride, jint u_row_stride,
+                                               jobject byte_buffer_v, jint v_pixel_stride,
+                                               jint v_row_stride, jbyteArray out_date, jint width,
+                                               jint height, jboolean flip_horizontal, jint rotate) {
+    return pretreatmentYuv420pData(env, clazz, byte_buffer_y, y_row_stride, byte_buffer_u,
+                                   u_pixel_stride, u_row_stride,
+                                   byte_buffer_v, v_pixel_stride, v_row_stride, out_date, width,
+                                   height, flip_horizontal, rotate, Pix_Format::GRAY);
+}
+extern "C"
+JNIEXPORT jint JNICALL
+Java_com_luoye_bzyuvlib_BZYUVUtil_yv12ToGray(JNIEnv *env, jclass clazz, jbyteArray yv12,
+                                             jbyteArray out_date, jint width, jint height,
+                                             jboolean flip_horizontal, jint rotate) {
+    return pretreatmentYV12Data(env, clazz, yv12, out_date, width, height, flip_horizontal, rotate,
+                                Pix_Format::GRAY);
+}
+extern "C"
+JNIEXPORT jint JNICALL
+Java_com_luoye_bzyuvlib_BZYUVUtil_nv21ToGray(JNIEnv *env, jclass clazz, jbyteArray nv21,
+                                             jbyteArray out_date, jint width, jint height,
+                                             jboolean flip_horizontal, jint rotate) {
+    return pretreatmentNV21Data(env, clazz, nv21, out_date, width, height, flip_horizontal, rotate,
+                                Pix_Format::GRAY);
 }
