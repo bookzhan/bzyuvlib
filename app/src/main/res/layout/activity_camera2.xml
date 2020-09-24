@@ -24,5 +24,6 @@
     <ImageView
         android:id="@+id/iv_preview"
         android:layout_width="480px"
+        android:background="#f00"
         android:layout_height="640px" />
 </LinearLayout>

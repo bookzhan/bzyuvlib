@@ -19,6 +19,7 @@ public class BZYUVUtil {
     private byte[] outDataRGBA = null;
     private byte[] outDataBGRA = null;
     private byte[] outYUV420 = null;
+    private byte[] outGrey = null;
     private int lastWidth = 0;
     private int lastHeight = 0;
 
@@ -64,9 +65,18 @@ public class BZYUVUtil {
         return outYUV420;
     }
 
-    public byte[] yuv420pToGray(Image image, boolean flipHorizontal, int rotate) {
-
-        return null;
+    public byte[] yuv420pToGrey(Image image, boolean flipHorizontal, int rotate) {
+        if (null == image || Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
+            return null;
+        }
+        if (null == outGrey || image.getWidth() != lastWidth || image.getHeight() != lastHeight) {
+            outGrey = new byte[image.getWidth() * image.getHeight()*4];
+            lastWidth = image.getWidth();
+            lastHeight = image.getHeight();
+        }
+        Image.Plane[] planes = image.getPlanes();
+        BZYUVUtil.yuv420ToGray(planes[0].getBuffer(), planes[0].getRowStride(), planes[1].getBuffer(), planes[1].getPixelStride(), planes[1].getRowStride(), planes[2].getBuffer(), planes[2].getPixelStride(), planes[2].getRowStride(), outGrey, image.getWidth(), image.getHeight(), flipHorizontal, rotate);
+        return outGrey;
     }
 
     public static native int preHandleYUV420(ByteBuffer byteBufferY, int yRowStride, ByteBuffer byteBufferU, int uPixelStride, int uRowStride, ByteBuffer byteBufferV, int vPixelStride, int vRowStride, byte[] outDate, int width, int height, boolean flipHorizontal, int rotate);
@@ -89,9 +99,9 @@ public class BZYUVUtil {
 
     public static native int yuv420ToGray(ByteBuffer byteBufferY, int yRowStride, ByteBuffer byteBufferU, int uPixelStride, int uRowStride, ByteBuffer byteBufferV, int vPixelStride, int vRowStride, byte[] outDate, int width, int height, boolean flipHorizontal, int rotate);
 
-    public static native int yv12ToGray(byte[] yv12, byte[] outDate, int width, int height, boolean flipHorizontal, int rotate);
+    public static native int yv12ToGrey(byte[] yv12, byte[] outDate, int width, int height, boolean flipHorizontal, int rotate);
 
-    public static native int nv21ToGray(byte[] nv21, byte[] outDate, int width, int height, boolean flipHorizontal, int rotate);
+    public static native int nv21ToGrey(byte[] nv21, byte[] outDate, int width, int height, boolean flipHorizontal, int rotate);
 
     /**
      * @param outDate YUVI420

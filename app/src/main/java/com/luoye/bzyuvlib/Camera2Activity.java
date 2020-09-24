@@ -32,6 +32,7 @@ public class Camera2Activity extends AppCompatActivity {
         setContentView(R.layout.activity_camera2);
         iv_preview = findViewById(R.id.iv_preview);
         bz_camera2_view = findViewById(R.id.bz_camera2_view);
+        bz_camera2_view.setPreviewTargetSize(480,640);
         bz_camera2_view.setCheckCameraCapacity(false);
         bzyuvUtil = new BZYUVUtil();
         bz_camera2_view.setOnStatusChangeListener(new BZCamera2View.OnStatusChangeListener() {
@@ -48,7 +49,6 @@ public class Camera2Activity extends AppCompatActivity {
                     width = image.getHeight();
                     height = image.getWidth();
                 }
-
                 long startTime = System.currentTimeMillis();
                 byte[] pixData = bzyuvUtil.yuv420pToRGBA(image, bz_camera2_view.getCurrentCameraLensFacing() == CameraCharacteristics.LENS_FACING_FRONT, displayOrientation);
 

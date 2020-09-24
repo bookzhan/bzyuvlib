@@ -6,7 +6,7 @@
 #include <android/bitmap.h>
 
 enum Pix_Format {
-    RGBA, BGRA, YUV420, GRAY
+    RGBA, BGRA, YUV420, GREY
 };
 
 int
@@ -86,6 +86,17 @@ handle_conversion(unsigned char *yData, unsigned char *uData, unsigned char *vDa
         memcpy(outData, finalYData, ySize);
         memcpy(outData + ySize, finalUData, ySize / 4);
         memcpy(outData + ySize + ySize / 4, finalVData, ySize / 4);
+    } else if (pixFormat == Pix_Format::GREY) {
+        unsigned char *bufferTemp = static_cast<unsigned char *>(malloc(
+                targetWidth * targetHeight * 4));
+        libyuv::I420ToARGB(finalYData, targetWidth,
+                           finalVData, targetWidth / 2,
+                           finalUData, targetWidth / 2,
+                           bufferTemp, targetWidth * 4,
+                           targetWidth, targetHeight);
+        libyuv::ARGBGrayTo(bufferTemp, targetWidth * 4, outData, targetWidth * 4, targetWidth,
+                           targetHeight);
+        free(bufferTemp);
     }
     if (nullptr != mirror_i420_data) {
         free(mirror_i420_data);
@@ -139,11 +150,11 @@ int pretreatmentYuv420pData(JNIEnv *env, jclass clazz, jobject byte_buffer_y, in
                              buffer + ySize, width / 2,
                              buffer + ySize + ySize / 4, width / 2, width, height);
 
-    int  ret = handle_conversion(buffer,
-                                      buffer + ySize,
-                                      buffer + ySize + ySize / 4,
-                                      reinterpret_cast<unsigned char *>(p_out_date), width,
-                                      height, flip_horizontal, rotate, pixFormat);;
+    int ret = handle_conversion(buffer,
+                                buffer + ySize,
+                                buffer + ySize + ySize / 4,
+                                reinterpret_cast<unsigned char *>(p_out_date), width,
+                                height, flip_horizontal, rotate, pixFormat);;
     free(buffer);
     env->ReleaseByteArrayElements(out_date, p_out_date, JNI_FALSE);
     return ret;
@@ -622,21 +633,21 @@ Java_com_luoye_bzyuvlib_BZYUVUtil_yuv420ToGray(JNIEnv *env, jclass clazz, jobjec
     return pretreatmentYuv420pData(env, clazz, byte_buffer_y, y_row_stride, byte_buffer_u,
                                    u_pixel_stride, u_row_stride,
                                    byte_buffer_v, v_pixel_stride, v_row_stride, out_date, width,
-                                   height, flip_horizontal, rotate, Pix_Format::GRAY);
+                                   height, flip_horizontal, rotate, Pix_Format::GREY);
 }
 extern "C"
 JNIEXPORT jint JNICALL
-Java_com_luoye_bzyuvlib_BZYUVUtil_yv12ToGray(JNIEnv *env, jclass clazz, jbyteArray yv12,
+Java_com_luoye_bzyuvlib_BZYUVUtil_yv12ToGrey(JNIEnv *env, jclass clazz, jbyteArray yv12,
                                              jbyteArray out_date, jint width, jint height,
                                              jboolean flip_horizontal, jint rotate) {
     return pretreatmentYV12Data(env, clazz, yv12, out_date, width, height, flip_horizontal, rotate,
-                                Pix_Format::GRAY);
+                                Pix_Format::GREY);
 }
 extern "C"
 JNIEXPORT jint JNICALL
-Java_com_luoye_bzyuvlib_BZYUVUtil_nv21ToGray(JNIEnv *env, jclass clazz, jbyteArray nv21,
+Java_com_luoye_bzyuvlib_BZYUVUtil_nv21ToGrey(JNIEnv *env, jclass clazz, jbyteArray nv21,
                                              jbyteArray out_date, jint width, jint height,
                                              jboolean flip_horizontal, jint rotate) {
     return pretreatmentNV21Data(env, clazz, nv21, out_date, width, height, flip_horizontal, rotate,
-                                Pix_Format::GRAY);
+                                Pix_Format::GREY);
 }
