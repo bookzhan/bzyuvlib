@@ -87,16 +87,7 @@ handle_conversion(unsigned char *yData, unsigned char *uData, unsigned char *vDa
         memcpy(outData + ySize, finalUData, ySize / 4);
         memcpy(outData + ySize + ySize / 4, finalVData, ySize / 4);
     } else if (pixFormat == Pix_Format::GREY) {
-        unsigned char *bufferTemp = static_cast<unsigned char *>(malloc(
-                targetWidth * targetHeight * 4));
-        libyuv::I420ToARGB(finalYData, targetWidth,
-                           finalVData, targetWidth / 2,
-                           finalUData, targetWidth / 2,
-                           bufferTemp, targetWidth * 4,
-                           targetWidth, targetHeight);
-        libyuv::ARGBGrayTo(bufferTemp, targetWidth * 4, outData, targetWidth * 4, targetWidth,
-                           targetHeight);
-        free(bufferTemp);
+        memcpy(outData, finalYData, ySize);
     }
     if (nullptr != mirror_i420_data) {
         free(mirror_i420_data);
@@ -110,7 +101,7 @@ handle_conversion(unsigned char *yData, unsigned char *uData, unsigned char *vDa
 int pretreatmentYuv420pData(JNIEnv *env, jclass clazz, jobject byte_buffer_y, int yRowStride,
                             jobject byte_buffer_u, jint u_pixel_stride, int uRowStride,
                             jobject byte_buffer_v, jint v_pixel_stride, int vRowStride,
-                            jbyteArray out_date, jint width, jint height,
+                            jbyteArray out_data, jint width, jint height,
                             jboolean flip_horizontal, jint rotate, Pix_Format pixFormat) {
     if (nullptr == byte_buffer_y || nullptr == byte_buffer_u || nullptr == byte_buffer_v ||
         u_pixel_stride <= 0 || v_pixel_stride <= 0) {
@@ -118,7 +109,7 @@ int pretreatmentYuv420pData(JNIEnv *env, jclass clazz, jobject byte_buffer_y, in
                 "nullptr == byte_buffer_y || nullptr == byte_buffer_u || nullptr == byte_buffer_v ||u_pixel_stride <= 0 || v_pixel_stride <= 0");
         return -1;
     }
-    if (nullptr == out_date || width <= 0 || height <= 0) {
+    if (nullptr == out_data || width <= 0 || height <= 0) {
         BZLogUtil::logE("nullptr == rgba || width <= 0 || height <= 0");
         return -1;
     }
@@ -137,7 +128,7 @@ int pretreatmentYuv420pData(JNIEnv *env, jclass clazz, jobject byte_buffer_y, in
         BZLogUtil::logE("Get VData return null");
         return -1;
     }
-    auto *p_out_date = env->GetByteArrayElements(out_date, JNI_FALSE);
+    auto *p_out_data = env->GetByteArrayElements(out_data, JNI_FALSE);
 
     int ySize = width * height;
     int yuvSize = ySize * 3 / 2;
@@ -153,10 +144,10 @@ int pretreatmentYuv420pData(JNIEnv *env, jclass clazz, jobject byte_buffer_y, in
     int ret = handle_conversion(buffer,
                                 buffer + ySize,
                                 buffer + ySize + ySize / 4,
-                                reinterpret_cast<unsigned char *>(p_out_date), width,
+                                reinterpret_cast<unsigned char *>(p_out_data), width,
                                 height, flip_horizontal, rotate, pixFormat);;
     free(buffer);
-    env->ReleaseByteArrayElements(out_date, p_out_date, JNI_FALSE);
+    env->ReleaseByteArrayElements(out_data, p_out_data, JNI_FALSE);
     return ret;
 }
 
@@ -166,12 +157,12 @@ Java_com_luoye_bzyuvlib_BZYUVUtil_yuv420pToRGBA(JNIEnv *env, jclass clazz, jobje
                                                 jint y_row_stride, jobject byte_buffer_u,
                                                 jint u_pixel_stride, jint u_row_stride,
                                                 jobject byte_buffer_v, jint v_pixel_stride,
-                                                jint v_row_stride, jbyteArray out_date,
+                                                jint v_row_stride, jbyteArray out_data,
                                                 jint width, jint height, jboolean flip_horizontal,
                                                 jint rotate) {
     return pretreatmentYuv420pData(env, clazz, byte_buffer_y, y_row_stride, byte_buffer_u,
                                    u_pixel_stride, u_row_stride,
-                                   byte_buffer_v, v_pixel_stride, v_row_stride, out_date, width,
+                                   byte_buffer_v, v_pixel_stride, v_row_stride, out_data, width,
                                    height, flip_horizontal, rotate, Pix_Format::RGBA);
 }
 
@@ -181,12 +172,12 @@ Java_com_luoye_bzyuvlib_BZYUVUtil_yuv420pToBGRA(JNIEnv *env, jclass clazz, jobje
                                                 jint y_row_stride, jobject byte_buffer_u,
                                                 jint u_pixel_stride, jint u_row_stride,
                                                 jobject byte_buffer_v, jint v_pixel_stride,
-                                                jint v_row_stride, jbyteArray out_date,
+                                                jint v_row_stride, jbyteArray out_data,
                                                 jint width, jint height, jboolean flip_horizontal,
                                                 jint rotate) {
     return pretreatmentYuv420pData(env, clazz, byte_buffer_y, y_row_stride, byte_buffer_u,
                                    u_pixel_stride, u_row_stride,
-                                   byte_buffer_v, v_pixel_stride, v_row_stride, out_date, width,
+                                   byte_buffer_v, v_pixel_stride, v_row_stride, out_data, width,
                                    height, flip_horizontal, rotate, Pix_Format::BGRA);
 }
 extern "C"
@@ -195,20 +186,20 @@ Java_com_luoye_bzyuvlib_BZYUVUtil_preHandleYUV420(JNIEnv *env, jclass clazz, job
                                                   jint y_row_stride, jobject byte_buffer_u,
                                                   jint u_pixel_stride, jint u_row_stride,
                                                   jobject byte_buffer_v, jint v_pixel_stride,
-                                                  jint v_row_stride, jbyteArray out_date,
+                                                  jint v_row_stride, jbyteArray out_data,
                                                   jint width, jint height,
                                                   jboolean flip_horizontal, jint rotate) {
     return pretreatmentYuv420pData(env, clazz, byte_buffer_y, y_row_stride, byte_buffer_u,
                                    u_pixel_stride, u_row_stride,
-                                   byte_buffer_v, v_pixel_stride, v_row_stride, out_date, width,
+                                   byte_buffer_v, v_pixel_stride, v_row_stride, out_data, width,
                                    height, flip_horizontal, rotate, Pix_Format::YUV420);
 }
 
 
 int pretreatmentYV12Data(JNIEnv *env, jclass clazz, jbyteArray yv12_,
-                         jbyteArray out_date, jint width, jint height,
+                         jbyteArray out_data, jint width, jint height,
                          jboolean flip_horizontal, jint rotate, Pix_Format pixFormat) {
-    if (nullptr == yv12_ || nullptr == out_date) {
+    if (nullptr == yv12_ || nullptr == out_data) {
         BZLogUtil::logE("nullptr == nv21_ || nullptr == byte_buffer_");
         return -1;
     }
@@ -221,7 +212,7 @@ int pretreatmentYV12Data(JNIEnv *env, jclass clazz, jbyteArray yv12_,
         BZLogUtil::logE("nullptr == data_nv21");
         return -1;
     }
-    auto *p_argb_byte_buffer = env->GetByteArrayElements(out_date, JNI_FALSE);
+    auto *p_argb_byte_buffer = env->GetByteArrayElements(out_data, JNI_FALSE);
     if (nullptr == p_argb_byte_buffer) {
         BZLogUtil::logE("Get p_byte_buffer return null");
         return -1;
@@ -237,7 +228,7 @@ int pretreatmentYV12Data(JNIEnv *env, jclass clazz, jbyteArray yv12_,
         BZLogUtil::logE("handle_conversion fail");
     }
     env->ReleaseByteArrayElements(yv12_, data_yv12, 0);
-    env->ReleaseByteArrayElements(out_date, p_argb_byte_buffer, 0);
+    env->ReleaseByteArrayElements(out_data, p_argb_byte_buffer, 0);
     return 0;
 }
 
@@ -245,27 +236,27 @@ int pretreatmentYV12Data(JNIEnv *env, jclass clazz, jbyteArray yv12_,
 extern "C"
 JNIEXPORT jint JNICALL
 Java_com_luoye_bzyuvlib_BZYUVUtil_yv12ToRGBA(JNIEnv *env, jclass clazz, jbyteArray yv12_,
-                                             jbyteArray out_date, jint width, jint height,
+                                             jbyteArray out_data, jint width, jint height,
                                              jboolean flip_horizontal, jint rotate) {
-    return pretreatmentYV12Data(env, clazz, yv12_, out_date, width, height, flip_horizontal, rotate,
+    return pretreatmentYV12Data(env, clazz, yv12_, out_data, width, height, flip_horizontal, rotate,
                                 RGBA);
 }
 
 extern "C"
 JNIEXPORT jint JNICALL
 Java_com_luoye_bzyuvlib_BZYUVUtil_yv12ToBGRA(JNIEnv *env, jclass clazz, jbyteArray yv12_,
-                                             jbyteArray out_date, jint width, jint height,
+                                             jbyteArray out_data, jint width, jint height,
                                              jboolean flip_horizontal, jint rotate) {
 
-    return pretreatmentYV12Data(env, clazz, yv12_, out_date, width, height, flip_horizontal, rotate,
+    return pretreatmentYV12Data(env, clazz, yv12_, out_data, width, height, flip_horizontal, rotate,
                                 BGRA);
 }
 
 
 int pretreatmentNV21Data(JNIEnv *env, jclass clazz, jbyteArray nv21_,
-                         jbyteArray out_date, jint width, jint height,
+                         jbyteArray out_data, jint width, jint height,
                          jboolean flip_horizontal, jint rotate, Pix_Format pixFormat) {
-    if (nullptr == nv21_ || nullptr == out_date) {
+    if (nullptr == nv21_ || nullptr == out_data) {
         BZLogUtil::logE("nullptr == nv21_ || nullptr == byte_buffer_");
         return -1;
     }
@@ -278,7 +269,7 @@ int pretreatmentNV21Data(JNIEnv *env, jclass clazz, jbyteArray nv21_,
         BZLogUtil::logE("nullptr == data_nv21");
         return -1;
     }
-    auto *p_argb_byte_buffer = env->GetByteArrayElements(out_date, JNI_FALSE);
+    auto *p_argb_byte_buffer = env->GetByteArrayElements(out_data, JNI_FALSE);
     if (nullptr == p_argb_byte_buffer) {
         BZLogUtil::logE("Get p_byte_buffer return null");
         return -1;
@@ -307,14 +298,14 @@ int pretreatmentNV21Data(JNIEnv *env, jclass clazz, jbyteArray nv21_,
     }
     free(buffer);
     env->ReleaseByteArrayElements(nv21_, data_nv21, 0);
-    env->ReleaseByteArrayElements(out_date, p_argb_byte_buffer, 0);
+    env->ReleaseByteArrayElements(out_data, p_argb_byte_buffer, 0);
     return ret;
 }
 
 int pretreatmentYUV420Data(JNIEnv *env, jclass clazz, jbyteArray yuv420_,
-                           jbyteArray out_date, jint width, jint height,
+                           jbyteArray out_data, jint width, jint height,
                            jboolean flip_horizontal, jint rotate, Pix_Format pixFormat) {
-    if (nullptr == yuv420_ || nullptr == out_date) {
+    if (nullptr == yuv420_ || nullptr == out_data) {
         BZLogUtil::logE("nullptr == nv21_ || nullptr == byte_buffer_");
         return -1;
     }
@@ -327,7 +318,7 @@ int pretreatmentYUV420Data(JNIEnv *env, jclass clazz, jbyteArray yuv420_,
         BZLogUtil::logE("nullptr == data_yuv420");
         return -1;
     }
-    auto *p_argb_byte_buffer = env->GetByteArrayElements(out_date, JNI_FALSE);
+    auto *p_argb_byte_buffer = env->GetByteArrayElements(out_data, JNI_FALSE);
     if (nullptr == p_argb_byte_buffer) {
         BZLogUtil::logE("Get p_byte_buffer return null");
         return -1;
@@ -342,41 +333,41 @@ int pretreatmentYUV420Data(JNIEnv *env, jclass clazz, jbyteArray yuv420_,
         BZLogUtil::logE("handle_conversion fail");
     }
     env->ReleaseByteArrayElements(yuv420_, data_yuv420, 0);
-    env->ReleaseByteArrayElements(out_date, p_argb_byte_buffer, 0);
+    env->ReleaseByteArrayElements(out_data, p_argb_byte_buffer, 0);
     return 0;
 }
 
 extern "C"
 JNIEXPORT jint JNICALL
 Java_com_luoye_bzyuvlib_BZYUVUtil_yuv420ToRGBA(JNIEnv *env, jclass clazz, jbyteArray yuv420,
-                                               jbyteArray out_date, jint width, jint height,
+                                               jbyteArray out_data, jint width, jint height,
                                                jboolean flip_horizontal, jint rotate) {
-    return pretreatmentYUV420Data(env, clazz, yuv420, out_date, width, height, flip_horizontal,
+    return pretreatmentYUV420Data(env, clazz, yuv420, out_data, width, height, flip_horizontal,
                                   rotate,
                                   RGBA);
 }extern "C"
 JNIEXPORT jint JNICALL
 Java_com_luoye_bzyuvlib_BZYUVUtil_yuv420ToBGRA(JNIEnv *env, jclass clazz, jbyteArray yuv420,
-                                               jbyteArray out_date, jint width, jint height,
+                                               jbyteArray out_data, jint width, jint height,
                                                jboolean flip_horizontal, jint rotate) {
-    return pretreatmentYUV420Data(env, clazz, yuv420, out_date, width, height, flip_horizontal,
+    return pretreatmentYUV420Data(env, clazz, yuv420, out_data, width, height, flip_horizontal,
                                   rotate,
                                   BGRA);
 }
 extern "C"
 JNIEXPORT jint JNICALL
 Java_com_luoye_bzyuvlib_BZYUVUtil_nv21ToRGBA(JNIEnv *env, jclass clazz, jbyteArray nv21,
-                                             jbyteArray out_date, jint width, jint height,
+                                             jbyteArray out_data, jint width, jint height,
                                              jboolean flip_horizontal, jint rotate) {
-    return pretreatmentNV21Data(env, clazz, nv21, out_date, width, height, flip_horizontal, rotate,
+    return pretreatmentNV21Data(env, clazz, nv21, out_data, width, height, flip_horizontal, rotate,
                                 RGBA);
 }
 extern "C"
 JNIEXPORT jint JNICALL
 Java_com_luoye_bzyuvlib_BZYUVUtil_nv21ToBGRA(JNIEnv *env, jclass clazz, jbyteArray nv21,
-                                             jbyteArray out_date, jint width, jint height,
+                                             jbyteArray out_data, jint width, jint height,
                                              jboolean flip_horizontal, jint rotate) {
-    return pretreatmentNV21Data(env, clazz, nv21, out_date, width, height, flip_horizontal, rotate,
+    return pretreatmentNV21Data(env, clazz, nv21, out_data, width, height, flip_horizontal, rotate,
                                 BGRA);
 }
 extern "C"
@@ -520,17 +511,17 @@ Java_com_luoye_bzyuvlib_BZYUVUtil_cropYUV420(JNIEnv *env, jclass type, jbyteArra
 extern "C"
 JNIEXPORT jint JNICALL
 Java_com_luoye_bzyuvlib_BZYUVUtil_preHandleNV21(JNIEnv *env, jclass clazz, jbyteArray nv21,
-                                                jbyteArray out_date, jint width, jint height,
+                                                jbyteArray out_data, jint width, jint height,
                                                 jboolean flip_horizontal, jint rotate) {
-    return pretreatmentNV21Data(env, clazz, nv21, out_date, width, height, flip_horizontal, rotate,
+    return pretreatmentNV21Data(env, clazz, nv21, out_data, width, height, flip_horizontal, rotate,
                                 Pix_Format::YUV420);
 }
 extern "C"
 JNIEXPORT jint JNICALL
 Java_com_luoye_bzyuvlib_BZYUVUtil_preHandleYV12(JNIEnv *env, jclass clazz, jbyteArray yv12,
-                                                jbyteArray out_date, jint width, jint height,
+                                                jbyteArray out_data, jint width, jint height,
                                                 jboolean flip_horizontal, jint rotate) {
-    return pretreatmentYV12Data(env, clazz, yv12, out_date, width, height, flip_horizontal, rotate,
+    return pretreatmentYV12Data(env, clazz, yv12, out_data, width, height, flip_horizontal, rotate,
                                 Pix_Format::YUV420);
 }
 extern "C"
@@ -628,26 +619,58 @@ Java_com_luoye_bzyuvlib_BZYUVUtil_yuv420ToGray(JNIEnv *env, jclass clazz, jobjec
                                                jint y_row_stride, jobject byte_buffer_u,
                                                jint u_pixel_stride, jint u_row_stride,
                                                jobject byte_buffer_v, jint v_pixel_stride,
-                                               jint v_row_stride, jbyteArray out_date, jint width,
+                                               jint v_row_stride, jbyteArray out_data, jint width,
                                                jint height, jboolean flip_horizontal, jint rotate) {
     return pretreatmentYuv420pData(env, clazz, byte_buffer_y, y_row_stride, byte_buffer_u,
                                    u_pixel_stride, u_row_stride,
-                                   byte_buffer_v, v_pixel_stride, v_row_stride, out_date, width,
+                                   byte_buffer_v, v_pixel_stride, v_row_stride, out_data, width,
                                    height, flip_horizontal, rotate, Pix_Format::GREY);
 }
 extern "C"
 JNIEXPORT jint JNICALL
 Java_com_luoye_bzyuvlib_BZYUVUtil_yv12ToGrey(JNIEnv *env, jclass clazz, jbyteArray yv12,
-                                             jbyteArray out_date, jint width, jint height,
+                                             jbyteArray out_data, jint width, jint height,
                                              jboolean flip_horizontal, jint rotate) {
-    return pretreatmentYV12Data(env, clazz, yv12, out_date, width, height, flip_horizontal, rotate,
+    return pretreatmentYV12Data(env, clazz, yv12, out_data, width, height, flip_horizontal, rotate,
                                 Pix_Format::GREY);
 }
 extern "C"
 JNIEXPORT jint JNICALL
 Java_com_luoye_bzyuvlib_BZYUVUtil_nv21ToGrey(JNIEnv *env, jclass clazz, jbyteArray nv21,
-                                             jbyteArray out_date, jint width, jint height,
+                                             jbyteArray out_data, jint width, jint height,
                                              jboolean flip_horizontal, jint rotate) {
-    return pretreatmentNV21Data(env, clazz, nv21, out_date, width, height, flip_horizontal, rotate,
+    return pretreatmentNV21Data(env, clazz, nv21, out_data, width, height, flip_horizontal, rotate,
                                 Pix_Format::GREY);
+}
+extern "C"
+JNIEXPORT jint JNICALL
+Java_com_luoye_bzyuvlib_BZYUVUtil_greyToRGBA(JNIEnv *env, jclass clazz, jbyteArray grey_,
+                                             jbyteArray out_data_, jint width, jint height) {
+    if (nullptr == grey_ || nullptr == out_data_) {
+        BZLogUtil::logE("greyToRGBA nullptr == grey_ || nullptr == out_data_");
+        return -1;
+    }
+    if (width * height != env->GetArrayLength(grey_)) {
+        BZLogUtil::logE("width * height * 4!=grey.length");
+        return -1;
+    }
+    if (width * height * 4 != env->GetArrayLength(out_data_)) {
+        BZLogUtil::logE("width * height * 4!=out_data.length");
+        return -1;
+    }
+    auto *grey = env->GetByteArrayElements(grey_, JNI_FALSE);
+    auto *out_data = env->GetByteArrayElements(out_data_, JNI_FALSE);
+
+
+    unsigned char *p_buffer = reinterpret_cast<unsigned char *>(out_data);
+    memset(p_buffer, 255, width * height * 4);
+    unsigned char *p_grey = reinterpret_cast<unsigned char *>(grey);
+    for (int i = 0; i < width * height; ++i) {
+        memset(p_buffer, *p_grey, 3);
+        p_buffer += 4;
+        p_grey++;
+    }
+    env->ReleaseByteArrayElements(grey_, grey, 0);
+    env->ReleaseByteArrayElements(out_data_, out_data, 0);
+    return 0;
 }
