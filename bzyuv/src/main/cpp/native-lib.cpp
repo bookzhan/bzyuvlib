@@ -662,15 +662,69 @@ Java_com_luoye_bzyuvlib_BZYUVUtil_greyToRGBA(JNIEnv *env, jclass clazz, jbyteArr
     auto *out_data = env->GetByteArrayElements(out_data_, JNI_FALSE);
 
 
-    unsigned char *p_buffer = reinterpret_cast<unsigned char *>(out_data);
+    auto *p_buffer = reinterpret_cast<unsigned char *>(out_data);
     memset(p_buffer, 255, width * height * 4);
-    unsigned char *p_grey = reinterpret_cast<unsigned char *>(grey);
+    auto *p_grey = reinterpret_cast<unsigned char *>(grey);
     for (int i = 0; i < width * height; ++i) {
         memset(p_buffer, *p_grey, 3);
         p_buffer += 4;
         p_grey++;
     }
     env->ReleaseByteArrayElements(grey_, grey, 0);
+    env->ReleaseByteArrayElements(out_data_, out_data, 0);
+    return 0;
+}
+extern "C"
+JNIEXPORT jint JNICALL
+Java_com_luoye_bzyuvlib_BZYUVUtil_translationSingleChannel(JNIEnv *env, jclass clazz,
+                                                           jbyteArray single_channel_data_,
+                                                           jbyteArray out_data_, jint width,
+                                                           jint height, jint translation_x,
+                                                           jint translation_y) {
+    if (nullptr == single_channel_data_ || nullptr == out_data_) {
+        BZLogUtil::logE("greyToRGBA nullptr == grey_ || nullptr == out_data_");
+        return -1;
+    }
+    if (std::abs(translation_x) > width || std::abs(translation_y) > height) {
+        BZLogUtil::logE("std::abs(translation_x)>width||std::abs(translation_y)>height");
+        return -1;
+    }
+    auto *single_channel_data = env->GetByteArrayElements(single_channel_data_, JNI_FALSE);
+    auto *out_data = env->GetByteArrayElements(out_data_, JNI_FALSE);
+
+    auto *p_single_channel_data = reinterpret_cast<unsigned char *>(single_channel_data);
+    auto *temp_buffer = static_cast<unsigned char *>(malloc(width * height));
+    memset(temp_buffer, 0, width * height);
+    unsigned char *p_buffer = temp_buffer;
+
+    if (translation_y < 0) {
+        p_single_channel_data -= width * translation_y;
+        for (int i = -translation_y; i < height; ++i) {
+            if (translation_x < 0) {
+                memcpy(p_buffer, p_single_channel_data - translation_x, width + translation_x);
+            } else {
+                memcpy(p_buffer + translation_x, p_single_channel_data, width - translation_x);
+            }
+            p_single_channel_data += width;
+            p_buffer += width;
+        }
+    } else {
+        p_buffer += width * translation_y;
+        for (int i = 0; i < height - translation_y; ++i) {
+            if (translation_x < 0) {
+                memcpy(p_buffer, p_single_channel_data - translation_x, width + translation_x);
+            } else {
+                memcpy(p_buffer + translation_x, p_single_channel_data, width - translation_x);
+            }
+            p_single_channel_data += width;
+            p_buffer += width;
+        }
+    }
+
+    memcpy(out_data, temp_buffer, width * height);
+    free(temp_buffer);
+
+    env->ReleaseByteArrayElements(single_channel_data_, single_channel_data, 0);
     env->ReleaseByteArrayElements(out_data_, out_data, 0);
     return 0;
 }

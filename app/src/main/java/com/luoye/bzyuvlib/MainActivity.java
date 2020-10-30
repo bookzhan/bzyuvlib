@@ -82,4 +82,8 @@ public class MainActivity extends AppCompatActivity {
     public void Bitmap2YUVActivity(View view) {
         startActivity(new Intent(this, Bitmap2YUVActivity.class));
     }
+
+    public void GreyImageTestActivity(View view) {
+        startActivity(new Intent(this, GreyImageTestActivity.class));
+    }
 }

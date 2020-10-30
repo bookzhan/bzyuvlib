@@ -128,4 +128,5 @@ public class BZYUVUtil {
 
     public static native int bitmapToYUV420(Bitmap bitmap, byte[] dis);
 
+    public static native int translationSingleChannel(byte[] singleChannelData, byte[] outData, int width, int height, int translationX, int translationY);
 }
