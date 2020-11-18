@@ -10,6 +10,7 @@
 8. yuvToGrey
 9. greyToRGBA
 10. translationSingleChannel
+11. 支持RGBA的旋转，镜像
 
 
 
@@ -30,7 +31,7 @@ allprojects {
 }
 ```
 
-##### 2.然后implementation 'com.luoye.bzlib:bzyuv:1.1.15'
+##### 2.然后implementation 'com.luoye.bzlib:bzyuv:1.1.16'
 
 
 

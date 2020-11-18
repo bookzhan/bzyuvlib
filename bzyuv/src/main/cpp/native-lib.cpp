@@ -728,3 +728,77 @@ Java_com_luoye_bzyuvlib_BZYUVUtil_translationSingleChannel(JNIEnv *env, jclass c
     env->ReleaseByteArrayElements(out_data_, out_data, 0);
     return 0;
 }
+
+int handleRGBA(unsigned char *buffer,
+               int stride, unsigned char *out_data, int width,
+               int height, bool flip_horizontal, int rotate) {
+    unsigned char *final_data = buffer;
+    size_t buffer_size = static_cast<size_t>(width * height * 4);
+
+    unsigned char *mirror_buffer = nullptr;
+    if (flip_horizontal) {
+        mirror_buffer = static_cast<unsigned char *>(malloc(buffer_size));
+        memset(mirror_buffer, 0, buffer_size);
+        libyuv::ARGBMirror(final_data, stride,
+                           mirror_buffer, stride, width, height);
+        final_data = mirror_buffer;
+    }
+    unsigned char *rotate_buffer = nullptr;
+    if (rotate != 0) {
+        rotate_buffer = static_cast<unsigned char *>(malloc(buffer_size));
+        memset(rotate_buffer, 0, buffer_size);
+        libyuv::RotationMode rotation_mode = libyuv::RotationMode::kRotate0;
+        int stride_dis = stride;
+        if (rotate == 90) {
+            rotation_mode = libyuv::RotationMode::kRotate90;
+            stride_dis = height * 4;
+        } else if (rotate == 180) {
+            rotation_mode = libyuv::RotationMode::kRotate180;
+        } else if (rotate == 270) {
+            rotation_mode = libyuv::RotationMode::kRotate270;
+            stride_dis = height * 4;
+        }
+        libyuv::ARGBRotate(final_data, stride, rotate_buffer, stride_dis, width, height,
+                           rotation_mode);
+        final_data = rotate_buffer;
+    }
+    memcpy(out_data, final_data, buffer_size);
+
+    if (nullptr != mirror_buffer) {
+        free(mirror_buffer);
+    }
+    if (nullptr != rotate_buffer) {
+        free(rotate_buffer);
+    }
+    return 0;
+}
+
+extern "C"
+JNIEXPORT jint JNICALL
+Java_com_luoye_bzyuvlib_BZYUVUtil_handleRGBA(JNIEnv *env, jclass clazz, jbyteArray buffer_,
+                                             jint stride, jbyteArray out_data_, jint width,
+                                             jint height, jboolean flip_horizontal, jint rotate) {
+    auto *buffer = env->GetByteArrayElements(buffer_, JNI_FALSE);
+    auto *out_data = env->GetByteArrayElements(out_data_, JNI_FALSE);
+    int ret = handleRGBA(reinterpret_cast<unsigned char *>(buffer), stride,
+                         reinterpret_cast<unsigned char *>(out_data), width, height,
+                         flip_horizontal, rotate);
+
+    env->ReleaseByteArrayElements(buffer_, buffer, 0);
+    env->ReleaseByteArrayElements(out_data_, out_data, 0);
+    return ret;
+}extern "C"
+JNIEXPORT jint JNICALL
+Java_com_luoye_bzyuvlib_BZYUVUtil_handleRGBA4ByteBuffer(JNIEnv *env, jclass clazz,
+                                                        jobject byte_buffer, jint stride,
+                                                        jbyteArray out_data_, jint width,
+                                                        jint height, jboolean flip_horizontal,
+                                                        jint rotate) {
+    auto *pData = (jbyte *) env->GetDirectBufferAddress(byte_buffer);
+    auto *out_data = env->GetByteArrayElements(out_data_, JNI_FALSE);
+    int ret = handleRGBA(reinterpret_cast<unsigned char *>(pData), stride,
+                         reinterpret_cast<unsigned char *>(out_data), width, height,
+                         flip_horizontal, rotate);
+    env->ReleaseByteArrayElements(out_data_, out_data, 0);
+    return ret;
+}

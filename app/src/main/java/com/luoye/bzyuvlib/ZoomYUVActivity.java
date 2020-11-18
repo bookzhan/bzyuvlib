@@ -10,7 +10,7 @@ import android.widget.ImageView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.luoye.bzcamera.BZCameraView;
-import com.luoye.bzcamera.listener.CameraStateListener;
+import com.luoye.bzcamera.listener.OnCameraStateListener;
 
 import java.nio.ByteBuffer;
 
@@ -39,7 +39,7 @@ public class ZoomYUVActivity extends AppCompatActivity {
 
         bz_camera_view.setPreviewFormat(ImageFormat.NV21);
         bz_camera_view.setNeedCallBackData(true);
-        bz_camera_view.setCameraStateListener(new CameraStateListener() {
+        bz_camera_view.setOnCameraStateListener(new OnCameraStateListener() {
             @Override
             public void onPreviewSuccess(Camera camera, int width, int height) {
 

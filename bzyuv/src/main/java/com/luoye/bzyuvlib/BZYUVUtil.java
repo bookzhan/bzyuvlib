@@ -20,6 +20,7 @@ public class BZYUVUtil {
     private byte[] outDataBGRA = null;
     private byte[] outYUV420 = null;
     private byte[] outGrey = null;
+    private byte[] outPreHandleRGBAData = null;
     private int lastWidth = 0;
     private int lastHeight = 0;
 
@@ -79,6 +80,21 @@ public class BZYUVUtil {
         return outGrey;
     }
 
+    public byte[] preHandleRGBA(Image image, boolean flipHorizontal, int rotate) {
+        if (null == image || Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
+            return null;
+        }
+        if (null == outPreHandleRGBAData || image.getWidth() != lastWidth || image.getHeight() != lastHeight) {
+            outPreHandleRGBAData = new byte[image.getWidth() * image.getHeight() * 4];
+            lastWidth = image.getWidth();
+            lastHeight = image.getHeight();
+        }
+        Image.Plane[] planes = image.getPlanes();
+        BZYUVUtil.handleRGBA4ByteBuffer(planes[0].getBuffer(), planes[0].getRowStride(),
+                outPreHandleRGBAData, image.getWidth(), image.getHeight(), flipHorizontal, rotate);
+        return outPreHandleRGBAData;
+    }
+
     public static native int preHandleYUV420(ByteBuffer byteBufferY, int yRowStride, ByteBuffer byteBufferU, int uPixelStride, int uRowStride, ByteBuffer byteBufferV, int vPixelStride, int vRowStride, byte[] outData, int width, int height, boolean flipHorizontal, int rotate);
 
     public static native int yuv420pToRGBA(ByteBuffer byteBufferY, int yRowStride, ByteBuffer byteBufferU, int uPixelStride, int uRowStride, ByteBuffer byteBufferV, int vPixelStride, int vRowStride, byte[] outData, int width, int height, boolean flipHorizontal, int rotate);
@@ -103,6 +119,9 @@ public class BZYUVUtil {
 
     public static native int nv21ToGrey(byte[] nv21, byte[] outData, int width, int height, boolean flipHorizontal, int rotate);
 
+    public static native int handleRGBA4ByteBuffer(ByteBuffer byteBuffer, int stride, byte[] outData, int width, int height, boolean flipHorizontal, int rotate);
+
+    public static native int handleRGBA(byte[] buffer, int stride, byte[] outData, int width, int height, boolean flipHorizontal, int rotate);
 
     /**
      * @return Here RGBA and BGRA are the same.

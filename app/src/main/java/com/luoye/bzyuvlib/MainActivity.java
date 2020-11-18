@@ -86,4 +86,8 @@ public class MainActivity extends AppCompatActivity {
     public void GreyImageTestActivity(View view) {
         startActivity(new Intent(this, GreyImageTestActivity.class));
     }
+
+    public void RGBAHandleActivity(View view) {
+        startActivity(new Intent(this, RGBAHandleActivity.class));
+    }
 }

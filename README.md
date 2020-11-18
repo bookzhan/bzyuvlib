@@ -10,6 +10,7 @@ I previously wrote a YUV to RGBA project based on RenderScript, address: https:/
 8. yuvToGrey
 9. greyToRGBA
 10. translationSingleChannel
+11. Support RGBA rotation and mirroring
 
 
 
@@ -30,7 +31,7 @@ allprojects {
 }
 ```
 
-##### 2.implementation 'com.luoye.bzlib:bzyuv:1.1.15'
+##### 2.implementation 'com.luoye.bzlib:bzyuv:1.1.16'
 
 
 

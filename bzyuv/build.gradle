@@ -5,7 +5,7 @@ publish {
     userOrg = 'bookzhan' //bintray账户下某个组织id
     groupId = 'com.luoye.bzlib' //maven仓库下库的包名，一般为模块包名
     artifactId = 'bzyuv' //项目名称
-    publishVersion = '1.1.15' //版本号
+    publishVersion = '1.1.16' //版本号
     uploadName = 'bzyuv'
     repoName = 'bzlib'
     desc = 'bzyuv util' //项目介绍，可以不写
