@@ -1,17 +1,5 @@
 apply plugin: 'com.android.library'
-apply plugin: 'com.novoda.bintray-release'
 
-publish {
-    userOrg = 'bookzhan' //bintray账户下某个组织id
-    groupId = 'com.luoye.bzlib' //maven仓库下库的包名，一般为模块包名
-    artifactId = 'bzyuv' //项目名称
-    publishVersion = '1.1.16' //版本号
-    uploadName = 'bzyuv'
-    repoName = 'bzlib'
-    desc = 'bzyuv util' //项目介绍，可以不写
-    website = 'https://github.com/bookzhan/bookzhan.github.io'
-    licences = ['Apache-2.0']
-}
 android {
     compileSdkVersion 29
     buildToolsVersion "29.0.2"
@@ -49,6 +37,33 @@ android {
     }
     lintOptions {
         abortOnError false
+    }
+}
+
+ext {
+    publish_group_id = 'io.github.bookzhan'
+    publish_artifact_id = "bzyuv"
+    publish_version = '1.1.16'
+    publish_description = 'bzyuvlib'
+
+    developer_id = 'guaishou'
+    developer_name = 'bookzhan'
+    developer_email = 'bookzhan@qq.com'
+
+    github_name = 'bookzhan'
+    github_project_name = 'bzyuvlib'
+    github_project_url = 'https://github.com/bookzhan/bzyuvlib'
+}
+File secretPropsFile = project.rootProject.file('local.properties')
+if (secretPropsFile.exists()) {
+    Properties p = new Properties()
+    p.load(new FileInputStream(secretPropsFile))
+    if(p.containsKey("signing.keyId")&&p.containsKey("signing.password")&&p.containsKey("signing.secretKeyRingFile")
+            &&p.containsKey("ossrhUsername")&&p.containsKey("ossrhPassword")){
+        apply from: 'https://raw.githubusercontent.com/bookzhan/maven-publish-gradle/master/publish.gradle'
+        println("Configuration information detected")
+    }else {
+        println("Please configure the signature and account information in the local.properties file")
     }
 }
 

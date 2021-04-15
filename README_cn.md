@@ -16,22 +16,18 @@
 
 #### 如何使用：
 
-##### 1.先添加maven { url 'https://dl.bintray.com/bookzhan/bzlib' }，如下所示
+##### 1.先添加mavenCentral()，如下所示
 
 ```
 allprojects {
     repositories {
         jcenter()
-        maven {
-            url 'https://maven.google.com/'
-            name 'Google'
-        }
-        maven { url 'https://dl.bintray.com/bookzhan/bzlib' }
+        mavenCentral()
     }
 }
 ```
 
-##### 2.然后implementation 'com.luoye.bzlib:bzyuv:1.1.16'
+##### 2.然后implementation 'io.github.bookzhan:bzyuv:1.1.16@aar'
 
 
 

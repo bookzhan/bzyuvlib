@@ -16,22 +16,18 @@ I previously wrote a YUV to RGBA project based on RenderScript, address: https:/
 
 #### How to use:
 
-##### 1.First add maven {url 'https://dl.bintray.com/bookzhan/bzlib'} as shown below
+##### 1.First add mavenCentral() as shown below
 
 ```
 allprojects {
     repositories {
         jcenter()
-        maven {
-            url 'https://maven.google.com/'
-            name 'Google'
-        }
-        maven { url 'https://dl.bintray.com/bookzhan/bzlib' }
+        mavenCentral()
     }
 }
 ```
 
-##### 2.implementation 'com.luoye.bzlib:bzyuv:1.1.16'
+##### 2. implementation 'io.github.bookzhan:bzyuv:1.1.16@aar'
 
 
 
