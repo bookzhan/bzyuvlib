@@ -62,6 +62,10 @@ if (secretPropsFile.exists()) {
             &&p.containsKey("ossrhUsername")&&p.containsKey("ossrhPassword")){
         apply from: 'https://raw.githubusercontent.com/bookzhan/maven-publish-gradle/master/publish.gradle'
         println("Configuration information detected")
+        task uploadToMavenCentral(group: 'publishing') {
+            dependsOn(assemble)
+            dependsOn(publishReleasePublicationToMavencentralRepository)
+        }
     }else {
         println("Please configure the signature and account information in the local.properties file")
     }
