@@ -138,6 +138,9 @@ public class BZYUVUtil {
      */
     public static native int preHandleYV12(byte[] yv12, byte[] outData, int width, int height, boolean flipHorizontal, int rotate);
 
+    public static native int yuvI420ToNV21(byte[] yuvI420, byte[] outData, int width, int height);
+
+    public static native int yuvI420ToNV12(byte[] yuvI420, byte[] outData, int width, int height);
 
     public static native int cropNV21(byte[] src, byte[] dis, int srcWidth, int srcHeight, int startX, int startY, int disWidth, int disHeight);
 

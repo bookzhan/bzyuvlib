@@ -43,7 +43,7 @@ android {
 ext {
     publish_group_id = 'io.github.bookzhan'
     publish_artifact_id = "bzyuv"
-    publish_version = '1.1.16'
+    publish_version = '1.1.17'
     publish_description = 'bzyuvlib'
 
     developer_id = 'guaishou'

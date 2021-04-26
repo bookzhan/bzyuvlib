@@ -82,5 +82,13 @@
         android:text="RGBAHandleActivity"
         android:textAllCaps="false" />
 
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="10dp"
+        android:onClick="YUV420ToNV21Activity"
+        android:text="YUV420ToNV21Activity"
+        android:textAllCaps="false" />
 
 </LinearLayout>

@@ -11,6 +11,8 @@ I previously wrote a YUV to RGBA project based on RenderScript, address: https:/
 9. greyToRGBA
 10. translationSingleChannel
 11. Support RGBA rotation and mirroring
+12. yuvI420ToNV21
+13. yuvI420ToNV12
 
 
 
@@ -27,7 +29,7 @@ allprojects {
 }
 ```
 
-##### 2. implementation 'io.github.bookzhan:bzyuv:1.1.16@aar'
+##### 2. implementation 'io.github.bookzhan:bzyuv:1.1.17@aar'
 
 
 

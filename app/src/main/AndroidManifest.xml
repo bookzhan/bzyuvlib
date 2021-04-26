@@ -15,7 +15,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".RGBAHandleActivity"></activity>
+        <activity android:name=".YUV420ToNV21Activity"/>
+        <activity android:name=".RGBAHandleActivity"/>
         <activity android:name=".GreyImageTestActivity" />
         <activity android:name=".Bitmap2YUVActivity" />
         <activity android:name=".ZoomYUVActivity" />

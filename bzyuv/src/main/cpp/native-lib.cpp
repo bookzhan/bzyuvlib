@@ -802,3 +802,43 @@ Java_com_luoye_bzyuvlib_BZYUVUtil_handleRGBA4ByteBuffer(JNIEnv *env, jclass claz
     env->ReleaseByteArrayElements(out_data_, out_data, 0);
     return ret;
 }
+extern "C"
+JNIEXPORT jint JNICALL
+Java_com_luoye_bzyuvlib_BZYUVUtil_yuvI420ToNV21(JNIEnv *env, jclass clazz, jbyteArray yuv_i420_,
+                                                jbyteArray out_data_, jint width, jint height) {
+    auto *yuv_i420 = env->GetByteArrayElements(yuv_i420_, JNI_FALSE);
+    auto *out_data = env->GetByteArrayElements(out_data_, JNI_FALSE);
+
+    int yuv_size = width * height;
+
+    int ret = libyuv::I420ToNV21(reinterpret_cast<const uint8_t *>(yuv_i420), width,
+                                 reinterpret_cast<const uint8_t *>(yuv_i420 + yuv_size), width / 2,
+                                 reinterpret_cast<const uint8_t *>(yuv_i420 + yuv_size * 5 / 4),
+                                 width / 2,
+                                 reinterpret_cast<uint8_t *>(out_data), width,
+                                 reinterpret_cast<uint8_t *>(out_data + yuv_size), width,
+                                 width, height);
+    env->ReleaseByteArrayElements(yuv_i420_, yuv_i420, 0);
+    env->ReleaseByteArrayElements(out_data_, out_data, 0);
+    return ret;
+}
+extern "C"
+JNIEXPORT jint JNICALL
+Java_com_luoye_bzyuvlib_BZYUVUtil_yuvI420ToNV12(JNIEnv *env, jclass clazz, jbyteArray yuv_i420_,
+                                                jbyteArray out_data_, jint width, jint height) {
+    auto *yuv_i420 = env->GetByteArrayElements(yuv_i420_, JNI_FALSE);
+    auto *out_data = env->GetByteArrayElements(out_data_, JNI_FALSE);
+
+    int yuv_size = width * height;
+
+    int ret = libyuv::I420ToNV12(reinterpret_cast<const uint8_t *>(yuv_i420), width,
+                                 reinterpret_cast<const uint8_t *>(yuv_i420 + yuv_size), width / 2,
+                                 reinterpret_cast<const uint8_t *>(yuv_i420 + yuv_size * 5 / 4),
+                                 width / 2,
+                                 reinterpret_cast<uint8_t *>(out_data), width,
+                                 reinterpret_cast<uint8_t *>(out_data + yuv_size), width,
+                                 width, height);
+    env->ReleaseByteArrayElements(yuv_i420_, yuv_i420, 0);
+    env->ReleaseByteArrayElements(out_data_, out_data, 0);
+    return ret;
+}
