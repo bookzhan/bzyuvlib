@@ -23,13 +23,12 @@
 ```
 allprojects {
     repositories {
-        jcenter()
-        mavenCentral()
+       maven { url "https://www.bzblog.online/nexus/repository/maven-releases/" }
     }
 }
 ```
 
-##### 2.然后implementation 'io.github.bookzhan:bzyuv:1.1.17@aar'
+##### 2.然后implementation 'com.guaishou.bzlib:bzyuv:1.1.17@aar'
 
 
 
