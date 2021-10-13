@@ -49,8 +49,8 @@ ext {
     NEXUS_PASSWORD = ''
     RELEASE_SNAPSHOT = false
 
-    POM_URL_SNAP = 'https://www.bzblog.online/nexus/repository/maven-snapshots/'
-    POM_URL = 'https://www.bzblog.online/nexus/repository/maven-releases/'
+    POM_URL_SNAP = 'https://www.raoyunsoft.com/nexus/repository/maven-snapshots/'
+    POM_URL = 'https://www.raoyunsoft.com/nexus/repository/maven-releases/'
 
     POM_GROUP_ID = 'com.guaishou.bzlib'
     POM_ATRIFACT_ID = 'bzyuv'
