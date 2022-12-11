@@ -1,16 +1,13 @@
 apply plugin: 'com.android.library'
-apply plugin: 'maven'
 apply plugin: 'maven-publish'
 
 
 android {
-    compileSdkVersion 29
-    buildToolsVersion "29.0.2"
-
+    compileSdkVersion 33
 
     defaultConfig {
-        minSdkVersion 15
-        targetSdkVersion 29
+        minSdkVersion 21
+        targetSdkVersion 33
         versionCode 1
         versionName "1.0"
 
@@ -19,6 +16,7 @@ android {
         externalNativeBuild {
             cmake {
                 cppFlags "-std=c++11"
+                version "3.18.1"
             }
         }
         ndk {
@@ -35,7 +33,6 @@ android {
     externalNativeBuild {
         cmake {
             path "src/main/cpp/CMakeLists.txt"
-            version "3.10.2"
         }
     }
     lintOptions {
@@ -54,7 +51,7 @@ ext {
 
     POM_GROUP_ID = 'com.guaishou.bzlib'
     POM_ATRIFACT_ID = 'bzyuv'
-    POM_VERSION = '1.1.17'
+    POM_VERSION = '1.1.18'
 }
 if (System.getenv('NEXUS_USER')) {
     NEXUS_USER = System.getenv('NEXUS_USER')
@@ -64,33 +61,23 @@ if (System.getenv('NEXUS_PASSWORD')) {
 }
 println("NEXUS_USER=" + NEXUS_USER + " NEXUS_PASSWORD=" + NEXUS_PASSWORD)
 
-// 上传到私服
-uploadArchives {
-    repositories {
-        mavenDeployer {
-            if (RELEASE_SNAPSHOT) {
-                //snapshot环境
-                snapshotRepository(url: POM_URL_SNAP) {
-                    authentication(userName: NEXUS_USER, password: NEXUS_PASSWORD)
-                }
-                POM_VERSION += "-SNAPSHOT"
-            } else {
-                //正式环境
-                repository(url: POM_URL) {
-                    authentication(userName: NEXUS_USER, password: NEXUS_PASSWORD)
-                }
+afterEvaluate {
+    publishing {
+        publications {
+            release(MavenPublication) {
+                from components.release
+                groupId = POM_GROUP_ID
+                artifactId = POM_ATRIFACT_ID
+                artifact androidSourcesJar
+                version = RELEASE_SNAPSHOT ? POM_VERSION + "-SNAPSHOT" : POM_VERSION
             }
-
-            pom.groupId = POM_GROUP_ID
-            pom.artifactId = POM_ATRIFACT_ID
-            pom.version = POM_VERSION
-
-            pom.project {
-                licenses {
-                    license {
-                        name 'The Apache Software License, Version 2.0'
-                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                    }
+        }
+        repositories {
+            maven {
+                url RELEASE_SNAPSHOT ? POM_URL_SNAP : POM_URL
+                credentials {
+                    username NEXUS_USER
+                    password NEXUS_PASSWORD
                 }
             }
         }
