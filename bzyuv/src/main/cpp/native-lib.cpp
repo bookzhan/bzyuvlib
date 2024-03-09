@@ -842,3 +842,23 @@ Java_com_luoye_bzyuvlib_BZYUVUtil_yuvI420ToNV12(JNIEnv *env, jclass clazz, jbyte
     env->ReleaseByteArrayElements(out_data_, out_data, 0);
     return ret;
 }
+extern "C"
+JNIEXPORT jint JNICALL
+Java_com_luoye_bzyuvlib_BZYUVUtil_yuvI420ToYV12(JNIEnv *env, jclass clazz, jbyteArray yuv_i420_, jbyteArray yv12_, jint width, jint height) {
+    auto *i420_data = env->GetByteArrayElements(yuv_i420_, JNI_FALSE);
+    auto *yv12_data = env->GetByteArrayElements(yv12_, JNI_FALSE);
+
+    int yuv_size = width * height;
+    // 将Y分量拷贝
+    memcpy(yv12_data, i420_data, yuv_size);
+
+    // 将V分量拷贝
+    memcpy(yv12_data + yuv_size * 5 / 4, i420_data + yuv_size, yuv_size / 4);
+
+    // 将U分量拷贝
+    memcpy(yv12_data + yuv_size, i420_data + yuv_size * 5 / 4, yuv_size / 4);
+
+    env->ReleaseByteArrayElements(yuv_i420_, i420_data, 0);
+    env->ReleaseByteArrayElements(yv12_, yv12_data, 0);
+    return 0;
+}

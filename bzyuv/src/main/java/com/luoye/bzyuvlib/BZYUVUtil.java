@@ -24,7 +24,7 @@ public class BZYUVUtil {
     private int lastWidth = 0;
     private int lastHeight = 0;
 
-    public byte[] yuv420pToRGBA(Image image, boolean flipHorizontal, int rotate) {
+    public synchronized byte[] yuv420pToRGBA(Image image, boolean flipHorizontal, int rotate) {
         if (null == image || Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
             return null;
         }
@@ -38,7 +38,7 @@ public class BZYUVUtil {
         return outDataRGBA;
     }
 
-    public byte[] yuv420pToBGRA(Image image, boolean flipHorizontal, int rotate) {
+    public synchronized byte[] yuv420pToBGRA(Image image, boolean flipHorizontal, int rotate) {
         if (null == image || Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
             return null;
         }
@@ -52,7 +52,7 @@ public class BZYUVUtil {
         return outDataBGRA;
     }
 
-    public byte[] preHandleYUV420(Image image, boolean flipHorizontal, int rotate) {
+    public synchronized byte[] preHandleYUV420(Image image, boolean flipHorizontal, int rotate) {
         if (null == image || Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
             return null;
         }
@@ -66,7 +66,7 @@ public class BZYUVUtil {
         return outYUV420;
     }
 
-    public byte[] yuv420pToGrey(Image image, boolean flipHorizontal, int rotate) {
+    public synchronized byte[] yuv420pToGrey(Image image, boolean flipHorizontal, int rotate) {
         if (null == image || Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
             return null;
         }
@@ -80,7 +80,7 @@ public class BZYUVUtil {
         return outGrey;
     }
 
-    public byte[] preHandleRGBA(Image image, boolean flipHorizontal, int rotate) {
+    public synchronized byte[] preHandleRGBA(Image image, boolean flipHorizontal, int rotate) {
         if (null == image || Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
             return null;
         }
@@ -141,6 +141,8 @@ public class BZYUVUtil {
     public static native int yuvI420ToNV21(byte[] yuvI420, byte[] outData, int width, int height);
 
     public static native int yuvI420ToNV12(byte[] yuvI420, byte[] outData, int width, int height);
+
+    public static native int yuvI420ToYV12(byte[] yuvI420, byte[] yv12, int width, int height);
 
     public static native int cropNV21(byte[] src, byte[] dis, int srcWidth, int srcHeight, int startX, int startY, int disWidth, int disHeight);
 

@@ -51,7 +51,7 @@ ext {
 
     POM_GROUP_ID = 'com.guaishou.bzlib'
     POM_ATRIFACT_ID = 'bzyuv'
-    POM_VERSION = '1.1.19'
+    POM_VERSION = '1.1.20'
 }
 if (System.getenv('NEXUS_USER')) {
     NEXUS_USER = System.getenv('NEXUS_USER')
@@ -83,7 +83,8 @@ afterEvaluate {
         }
     }
 }
-task androidSourcesJar(type: Jar) {
+
+tasks.register('androidSourcesJar', Jar) {
     archiveClassifier.set('sources')
     from android.sourceSets.main.java.getSrcDirs()
 }
