@@ -13,7 +13,7 @@ import java.nio.ByteBuffer;
  */
 public class BZYUVUtil {
     static {
-        System.loadLibrary("bzyuvlib");
+        BZYUVSoLoadingUtil.loadLibrary("bzyuvlib");
     }
 
     private byte[] outDataRGBA = null;
