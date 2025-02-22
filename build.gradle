@@ -16,8 +16,8 @@ allprojects {
     repositories {
         google()
         mavenCentral()
-        maven { url "https://www.raoyunsoft.com/nexus/repository/maven-releases/" }
-        maven { url "https://www.raoyunsoft.com/nexus/repository/maven-snapshots/" }
+        maven { url "https://nexus.raoyunsoft.com/repository/maven-releases/" }
+        maven { url "https://nexus.raoyunsoft.com/repository/maven-snapshots/" }
     }
     tasks.withType(Javadoc) {
         options.addStringOption('Xdoclint:none', '-quiet')
