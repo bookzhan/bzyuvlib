@@ -1,4 +1,4 @@
-I previously wrote a YUV to RGBA project based on RenderScript, address: https://www.raoyunsoft.com/wordpress/index.php/2020/01/19/yuvrenderscript/ If you like it, you can go here to find it, than Android native ScriptIntrinsicYuvToRGB is much more powerful, but recently found that RenderScript is much slower than Google ’s libyuv, so I wrote a YUV conversion project based on libyuv, and also supported the YUV conversion of Camera1 and Camera2 output, and the YUV mirror , Rotation, supported functions are as follows:
+I previously wrote a YUV to RGBA project based on RenderScript, address: https://blog.raoyunsoft.com/index.php/2020/01/19/yuvrenderscript/ If you like it, you can go here to find it, than Android native ScriptIntrinsicYuvToRGB is much more powerful, but recently found that RenderScript is much slower than Google ’s libyuv, so I wrote a YUV conversion project based on libyuv, and also supported the YUV conversion of Camera1 and Camera2 output, and the YUV mirror , Rotation, supported functions are as follows:
 
 1. yuv420pToRGBA/yuv420pToBGRA
 2. preHandleYUV
