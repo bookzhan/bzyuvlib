@@ -11,15 +11,15 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".YUV420ToNV21Activity"/>
-        <activity android:name=".RGBAHandleActivity"/>
-        <activity android:name=".GreyImageTestActivity" />
-        <activity android:name=".Bitmap2YUVActivity" />
-        <activity android:name=".ZoomYUVActivity" />
-        <activity android:name=".Camera2YUVCropActivity" />
-        <activity android:name=".Camera1YUVCropActivity" />
-        <activity android:name=".CameraActivity" />
-        <activity android:name=".MainActivity"
+        <activity android:name="com.luoye.bzyuv.YUV420ToNV21Activity"/>
+        <activity android:name="com.luoye.bzyuv.RGBAHandleActivity"/>
+        <activity android:name="com.luoye.bzyuv.GreyImageTestActivity" />
+        <activity android:name="com.luoye.bzyuv.Bitmap2YUVActivity" />
+        <activity android:name="com.luoye.bzyuv.ZoomYUVActivity" />
+        <activity android:name="com.luoye.bzyuv.Camera2YUVCropActivity" />
+        <activity android:name="com.luoye.bzyuv.Camera1YUVCropActivity" />
+        <activity android:name="com.luoye.bzyuv.CameraActivity" />
+        <activity android:name="com.luoye.bzyuv.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -27,7 +27,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".Camera2Activity" />
+        <activity android:name="com.luoye.bzyuv.Camera2Activity" />
     </application>
 
 </manifest>

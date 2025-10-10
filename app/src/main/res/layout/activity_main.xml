@@ -8,7 +8,8 @@
     android:orientation="vertical"
     android:paddingLeft="60dp"
     android:paddingRight="60dp"
-    tools:context=".MainActivity">
+    android:id="@+id/main"
+    tools:context="com.luoye.bzyuv.MainActivity">
 
     <Button
         android:layout_width="match_parent"

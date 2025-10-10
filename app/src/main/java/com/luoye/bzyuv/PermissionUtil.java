@@ -1,4 +1,4 @@
-package com.luoye.bzyuvlib;
+package com.luoye.bzyuv;
 
 import android.app.Activity;
 import android.content.Context;

@@ -1,27 +1,18 @@
-apply plugin: 'com.android.library'
-apply plugin: 'maven-publish'
-
+plugins {
+    id 'com.android.library'
+    id 'maven-publish'
+}
 
 android {
-    compileSdkVersion 33
+    namespace 'com.luoye.bzyuvlib'
+    compileSdk = libs.versions.compileSdk.get().toInteger()
 
     defaultConfig {
-        minSdkVersion 21
-        targetSdkVersion 33
-        versionCode 1
-        versionName "1.0"
-
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        consumerProguardFiles 'consumer-rules.pro'
-        externalNativeBuild {
-            cmake {
-                cppFlags "-std=c++11"
-                version "3.18.1"
-            }
-        }
-        ndk {
-            abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'
-        }
+        minSdk = libs.versions.minSdk.get().toInteger()
+        targetSdk = libs.versions.targetSdk.get().toInteger()
+        versionCode = 1
+        versionName = "1.0"
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
@@ -32,13 +23,18 @@ android {
     }
     externalNativeBuild {
         cmake {
-            path "src/main/cpp/CMakeLists.txt"
+            path file('src/main/cpp/CMakeLists.txt')
+            version '4.1.1'
         }
     }
-    lintOptions {
-        abortOnError false
+    ndkVersion '28.2.13676358'
+
+    publishing {
+        singleVariant("release") {
+            withSourcesJar()
+            withJavadocJar()
+        }
     }
-    ndkVersion '22.1.7171670'
 }
 
 ext {
@@ -51,7 +47,7 @@ ext {
 
     POM_GROUP_ID = 'com.guaishou.bzlib'
     POM_ATRIFACT_ID = 'bzyuv'
-    POM_VERSION = '1.1.21'
+    POM_VERSION = '1.1.22'
 }
 if (System.getenv('NEXUS_USER')) {
     NEXUS_USER = System.getenv('NEXUS_USER')
@@ -68,7 +64,6 @@ afterEvaluate {
                 from components.release
                 groupId = POM_GROUP_ID
                 artifactId = POM_ATRIFACT_ID
-                artifact androidSourcesJar
                 version = RELEASE_SNAPSHOT ? POM_VERSION + "-SNAPSHOT" : POM_VERSION
             }
         }
@@ -84,6 +79,8 @@ afterEvaluate {
     }
 }
 
+tasks.withType(PublishToMavenRepository).configureEach { it.dependsOn lint }
+
 tasks.register('androidSourcesJar', Jar) {
     archiveClassifier.set('sources')
     from android.sourceSets.main.java.getSrcDirs()
@@ -93,5 +90,6 @@ artifacts {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
 }
+

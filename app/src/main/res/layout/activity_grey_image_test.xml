@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="horizontal"
-    tools:context=".GreyImageTestActivity">
+    android:id="@+id/main"
+    tools:context="com.luoye.bzyuv.GreyImageTestActivity">
 
     <com.luoye.bzcamera.BZCamera2View
         android:id="@+id/bz_camera2_view"

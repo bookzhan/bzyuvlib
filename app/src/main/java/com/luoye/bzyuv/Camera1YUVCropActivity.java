@@ -1,4 +1,4 @@
-package com.luoye.bzyuvlib;
+package com.luoye.bzyuv;
 
 import android.graphics.Bitmap;
 import android.graphics.ImageFormat;
@@ -7,10 +7,15 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.ImageView;
 
+import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import com.luoye.bzcamera.BZCameraView;
 import com.luoye.bzcamera.listener.OnCameraStateListener;
+import com.luoye.bzyuvlib.BZYUVUtil;
 
 import java.nio.ByteBuffer;
 
@@ -33,7 +38,13 @@ public class Camera1YUVCropActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_camera1_y_u_v_crop);
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
         bz_camera_view = findViewById(R.id.bz_camera_view);
         bz_camera_view.setPreviewTargetSize(480, 640);
         bz_image_view = findViewById(R.id.bz_image_view);

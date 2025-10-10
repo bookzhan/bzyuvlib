@@ -28,7 +28,7 @@ allprojects {
 }
 ```
 
-##### 2. implementation 'com.guaishou.bzlib:bzyuv:1.1.19@aar'
+##### 2. implementation 'com.guaishou.bzlib:bzyuv:1.1.22@aar'
 
 
 

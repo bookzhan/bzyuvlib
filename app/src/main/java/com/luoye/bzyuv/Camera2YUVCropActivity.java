@@ -1,43 +1,60 @@
-package com.luoye.bzyuvlib;
+package com.luoye.bzyuv;
 
 import android.annotation.TargetApi;
 import android.graphics.Bitmap;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraDevice;
 import android.media.Image;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.ImageView;
 
+import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import com.luoye.bzcamera.BZCamera2View;
+import com.luoye.bzyuvlib.BZYUVUtil;
 
+import java.io.FileOutputStream;
 import java.nio.ByteBuffer;
 
-@TargetApi(Build.VERSION_CODES.LOLLIPOP)
-public class YUV420ToNV21Activity extends AppCompatActivity {
-    private static final String TAG = "bz_Camera2Activity";
+@TargetApi(android.os.Build.VERSION_CODES.LOLLIPOP)
+public class Camera2YUVCropActivity extends AppCompatActivity {
+    private static final String TAG = "bz_Camera2YUVCrop";
     private BZCamera2View bz_camera2_view;
     private ImageView iv_preview;
     private BZYUVUtil bzyuvUtil;
     private Bitmap bitmap;
     private long spaceTime;
     private int index;
-    private byte[] nv21Data;
-    private byte[] rgbaData;
+    private int cropStartX = 100;
+    private int cropStartY = 100;
+    private int cropWidth = 240;
+    private int cropHeight = 320;
+    private byte[] argbByteBuffer = null;
+    private byte[] cropYuvBuffer = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_yuv420_to_nv_21);
+        EdgeToEdge.enable(this);
+        setContentView(R.layout.activity_camera2_y_u_v_crop);
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
         iv_preview = findViewById(R.id.iv_preview);
         bz_camera2_view = findViewById(R.id.bz_camera2_view);
-        bz_camera2_view.setPreviewTargetSize(480, 640);
         bz_camera2_view.setCheckCameraCapacity(false);
         bzyuvUtil = new BZYUVUtil();
         bz_camera2_view.setOnStatusChangeListener(new BZCamera2View.OnStatusChangeListener() {
+
+            private FileOutputStream fileOutputStream;
+
             @Override
             public void onPreviewSuccess(CameraDevice mCameraDevice, int width, int height) {
 
@@ -51,27 +68,40 @@ public class YUV420ToNV21Activity extends AppCompatActivity {
                     width = image.getHeight();
                     height = image.getWidth();
                 }
+                if (width < cropWidth + cropStartX || height < cropHeight + cropStartY) {
+                    Log.e(TAG, "width < cropWidth + cropStartX || height < cropHeight + cropStartY");
+                    return;
+                }
+                if (null == argbByteBuffer) {
+                    argbByteBuffer = new byte[cropWidth * cropHeight * 4];
+                }
+                if (null == cropYuvBuffer) {
+                    cropYuvBuffer = new byte[cropWidth * cropHeight * 3 / 2];
+                }
                 long startTime = System.currentTimeMillis();
                 byte[] yuv420 = bzyuvUtil.preHandleYUV420(image, bz_camera2_view.getCurrentCameraLensFacing() == CameraCharacteristics.LENS_FACING_FRONT, displayOrientation);
-
-                if (null == nv21Data) {
-                    nv21Data = new byte[width * height * 3 / 2];
+                if (null == fileOutputStream) {
+                    try {
+                        fileOutputStream = new FileOutputStream("/sdcard/bzmedia/kk.yuv");
+                        fileOutputStream.write(yuv420, 0, yuv420.length);
+                        fileOutputStream.flush();
+                        fileOutputStream.close();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
-                if (null == rgbaData) {
-                    rgbaData = new byte[width * height * 4];
-                }
-                BZYUVUtil.yuvI420ToNV21(yuv420, nv21Data, width, height);
-//                BZYUVUtil.yuvI420ToNV12(yuv420, nv21Data, width, height);
 
-                BZYUVUtil.nv21ToRGBA(nv21Data,rgbaData,width,height,false,0);
+                BZYUVUtil.cropYUV420(yuv420, cropYuvBuffer, width, height, cropStartX, cropStartY, cropWidth, cropHeight);
+
+                BZYUVUtil.yuv420ToRGBA(cropYuvBuffer, argbByteBuffer, cropWidth, cropHeight, false, 0);
 
                 spaceTime += (System.currentTimeMillis() - startTime);
                 index++;
                 Log.d(TAG, "time cost=" + (spaceTime / index) + " bitmap.width=" + width + " height=" + height);
                 if (null == bitmap) {
-                    bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+                    bitmap = Bitmap.createBitmap(cropWidth, cropHeight, Bitmap.Config.ARGB_8888);
                 }
-                bitmap.copyPixelsFromBuffer(ByteBuffer.wrap(rgbaData));
+                bitmap.copyPixelsFromBuffer(ByteBuffer.wrap(argbByteBuffer));
                 iv_preview.post(new Runnable() {
                     @Override
                     public void run() {
@@ -80,7 +110,6 @@ public class YUV420ToNV21Activity extends AppCompatActivity {
                 });
             }
         });
-
     }
 
     @Override

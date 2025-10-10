@@ -1,22 +1,22 @@
-package com.luoye.bzyuvlib;
+package com.luoye.bzyuv;
 
-import androidx.annotation.RequiresApi;
+import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import android.graphics.Bitmap;
 import android.hardware.camera2.CameraDevice;
 import android.media.Image;
-import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
 import android.widget.ImageView;
 
 import com.luoye.bzcamera.BZCamera2View;
+import com.luoye.bzyuvlib.BZYUVUtil;
 
 import java.nio.ByteBuffer;
 
-@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 public class GreyImageTestActivity extends AppCompatActivity {
 
     private BZCamera2View bz_camera2_view;
@@ -29,7 +29,13 @@ public class GreyImageTestActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_grey_image_test);
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
         bzyuvUtil = new BZYUVUtil();
         image_view = findViewById(R.id.image_view);
         bz_camera2_view = findViewById(R.id.bz_camera2_view);

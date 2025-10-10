@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".RGBAHandleActivity">
+    android:id="@+id/main"
+    tools:context="com.luoye.bzyuv.RGBAHandleActivity">
 
     <ImageView
         android:id="@+id/iv_rgba_src"
