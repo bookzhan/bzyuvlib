@@ -1,4 +1,4 @@
-之前基于RenderScript写了一个YUV转RGBA的工程，地址：https://www.raoyunsoft.com/wordpress/index.php/2020/01/19/yuvrenderscript/ 喜欢的可以去看看，比Android原生的ScriptIntrinsicYuvToRGB要强大很多，但是近期在使用的过程中发现RenderScript比Google的libyuv速度要慢很多，于是我又基于libyuv写了一个YUV转换的工程，同时支持Camera1，Camera2输出的YUV转换,以及对YUV镜像，旋转，从YUV输出灰度图，灰度图转成RGBA, 单通道平移，具体支持的功能如下：
+之前基于RenderScript写了一个YUV转RGBA的工程，地址：https://blog.raoyunsoft.com/post/20 喜欢的可以去看看，比Android原生的ScriptIntrinsicYuvToRGB要强大很多，但是近期在使用的过程中发现RenderScript比Google的libyuv速度要慢很多，于是我又基于libyuv写了一个YUV转换的工程，同时支持Camera1，Camera2输出的YUV转换,以及对YUV镜像，旋转，从YUV输出灰度图，灰度图转成RGBA, 单通道平移，具体支持的功能如下：
 
 1. yuv420pToRGBA/yuv420pToBGRA
 2. preHandleYUV
