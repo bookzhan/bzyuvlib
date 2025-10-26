@@ -23,12 +23,12 @@ I previously wrote a YUV to RGBA project based on RenderScript, address: https:/
 ```
 allprojects {
     repositories {
-        maven { url "https://www.raoyunsoft.com/nexus/repository/maven-releases/" }
+        maven { url "https://nexus.raoyunsoft.com/repository/maven-releases/" }
     }
 }
 ```
 
-##### 2. implementation 'com.guaishou.bzlib:bzyuv:1.1.19@aar'
+##### 2. implementation 'com.guaishou.bzlib:bzyuv:1.1.22@aar'
 
 
 

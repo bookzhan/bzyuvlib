@@ -1,4 +1,4 @@
-package com.luoye.bzyuvlib;
+package com.luoye.bzyuv;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -9,7 +9,13 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.ImageView;
 
+import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+
+import com.luoye.bzyuvlib.BZYUVUtil;
 
 import java.io.FileOutputStream;
 import java.nio.ByteBuffer;
@@ -21,7 +27,13 @@ public class Bitmap2YUVActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_bitmap2_y_u_v);
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
         ImageView ivImageSrc = findViewById(R.id.iv_image_src);
         ImageView ivImageDis = findViewById(R.id.iv_image_dis);
         Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.timg);

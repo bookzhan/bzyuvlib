@@ -77,6 +77,10 @@ int ARGBToAR30(const uint8_t* src_argb,
                int width,
                int height);
 
+// Aliases
+#define ABGRToRGB24 ARGBToRAW
+#define ABGRToRAW ARGBToRGB24
+
 // Convert ARGB To RGB24.
 LIBYUV_API
 int ARGBToRGB24(const uint8_t* src_argb,
@@ -148,6 +152,30 @@ int ARGBToI444(const uint8_t* src_argb,
                int dst_stride_v,
                int width,
                int height);
+
+// Convert ARGB to AR64.
+LIBYUV_API
+int ARGBToAR64(const uint8_t* src_argb,
+               int src_stride_argb,
+               uint16_t* dst_ar64,
+               int dst_stride_ar64,
+               int width,
+               int height);
+
+// Convert ABGR to AB64.
+#define ABGRToAB64 ARGBToAR64
+
+// Convert ARGB to AB64.
+LIBYUV_API
+int ARGBToAB64(const uint8_t* src_argb,
+               int src_stride_argb,
+               uint16_t* dst_ab64,
+               int dst_stride_ab64,
+               int width,
+               int height);
+
+// Convert ABGR to AR64.
+#define ABGRToAR64 ARGBToAB64
 
 // Convert ARGB To I422.
 LIBYUV_API
